@@ -6,7 +6,7 @@ import RegisterUsers from './RegisterUsers.jsx';
 import CreateQuiz from './CreateQuiz.jsx';
 
 const AppContent = () => {
-    const [componentToShow, setComponentToShow] = useState("register");
+    const [componentToShow, setComponentToShow] = useState("login");
 
     const onClickLoginApp = () => {
         setComponentToShow("login");
@@ -23,7 +23,7 @@ const AppContent = () => {
     };
 
     const onRegister = () => {
-       console.log("Registro exitoso");
+       setComponentToShow("login");
     }; 
 
     const onCreateQuiz = (nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante) => {

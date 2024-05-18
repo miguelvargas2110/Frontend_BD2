@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const registerUser = async (formData) => {
     try {
-        const response = await axios.post('http://localhost:9090/ejemplos/usuarios', formData, {
+        const response = await axios.post('http://localhost:9090/autenticacion/registro', formData, {
             headers: {
                 'Content-Type': 'application/json',
             },

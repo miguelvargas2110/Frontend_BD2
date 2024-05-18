@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import Swal from 'sweetalert2';
+import loginUser from "../services/usuarioLoginService";
 
 const LoginForm = ({ onLogin }) => {
   const [active, setActive] = useState(
@@ -17,8 +19,28 @@ const LoginForm = ({ onLogin }) => {
     contrasena: ''
   }); 
 
-  const onSubmitLogin = (data) => {
-    
+  const onSubmitLogin = async(data) => {
+    formData.correo = data.loginEmail;
+    formData.contrasena = data.loginPassword;
+
+    try{
+      const response = await loginUser(formData);
+      if(response.success){
+        onLogin();
+      }else{
+        Swal.fire({
+            icon: "error",
+            text: response.message
+        });
+    }
+    }catch(error){
+      console.error('Error al registrarse:', error);
+      Swal.fire({
+          icon: "error",
+          text: 'Error al registrarse'
+      });  
+
+  }
   };
 
   return (
