@@ -12,8 +12,13 @@ const LoginForm = ({ onLogin }) => {
     formState: { errors },
   } = useForm();
 
+  const [formData, setFormData] = useState({
+    correo: '',
+    contrasena: ''
+  }); 
+
   const onSubmitLogin = (data) => {
-    onLogin(data.loginEmail, data.loginPassword);
+    
   };
 
   return (

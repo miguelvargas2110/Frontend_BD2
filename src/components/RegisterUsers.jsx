@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 import { useForm } from "react-hook-form";
+import Swal from 'sweetalert2';
+import registerUser from "../services/usuarioRegisterService";
 
 const RegisterUsers = ({ onRegister }) => {
     const {
@@ -23,16 +25,52 @@ const RegisterUsers = ({ onRegister }) => {
         }
     };
 
-    const onSubmitRegister = (data) => {
-        onRegister(
-            data.id,
-            data.nombre,
-            data.apellido,
-            data.rol,
-            data.group,
-            data.email,
-            data.password
-        );
+    const [formData, setFormData] = useState({
+        id: '',
+        nombre: '',
+        apellido: '',
+        correo: '',
+        contrasena: '',
+        rol: '',
+        grupoId: ''
+      }); 
+
+    const onSubmitRegister = async(data) => {
+        formData.id = data.id;
+        formData.nombre = data.nombre;
+        formData.apellido = data.apellido;
+        formData.correo = data.email;
+        formData.contrasena = data.password;
+        formData.rol = data.rol;
+        formData.grupoId = 1;
+        try{
+            const registerSuccess = await registerUser(formData);
+
+            if(registerSuccess.success){
+                Swal.fire({
+                    icon: "success",
+                    title: "El usuario con cedula " + formData.id + " ha sido registrado correctamente",
+                    showConfirmButton: false,
+                    timer: 5000
+                  });
+                onRegister();
+            }else{
+                Swal.fire({
+                    icon: "error",
+                    text: registerSuccess.message
+                });
+            }
+            
+            
+        }catch(error){
+            console.error('Error al registrarse:', error);
+            Swal.fire({
+                icon: "error",
+                text: 'Error al registrarse'
+            });  
+
+        }
+        
     };
 
     return (
