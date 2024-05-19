@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { useForm } from "react-hook-form";
 import Swal from 'sweetalert2';
 import registerUser from "../services/usuarioRegisterService";
+import grupoServices from "../services/gruposService";
 
 const RegisterUsers = ({ onRegister }) => {
     const {
@@ -13,6 +14,7 @@ const RegisterUsers = ({ onRegister }) => {
     } = useForm();
 
     const [showGroupStudent, setshowGroupStudent] = useState(true);
+    const [grupos, setGrupos] = useState([]); // Inicializa grupos como un array vacío
 
     const password = watch("password");
 
@@ -33,50 +35,60 @@ const RegisterUsers = ({ onRegister }) => {
         contrasena: '',
         rol: '',
         grupoId: ''
-      }); 
+    });
 
-    const onSubmitRegister = async(data) => {
+    useEffect(() => {
+        const fetchGrupos = async () => {
+            const response = await grupoServices.obtenerGrupos();
+            if (response.success) {
+                setGrupos(response.message); // Asigna los grupos al estado
+            } else {
+                console.error('Error al obtener grupos:', response.message);
+            }
+        };
+        fetchGrupos();
+    }, []); // El segundo argumento [] asegura que esto solo se ejecute una vez al montar el componente
+
+    const onSubmitRegister = async (data) => {
         formData.id = data.id;
         formData.nombre = data.nombre;
         formData.apellido = data.apellido;
         formData.correo = data.email;
         formData.contrasena = data.password;
         formData.rol = data.rol;
-        formData.grupoId = 1;
-        try{
+        formData.grupoId = data.group; // Asigna el grupo seleccionado
+
+        try {
             const registerSuccess = await registerUser(formData);
 
-            if(registerSuccess.success){
+            if (registerSuccess.success) {
                 Swal.fire({
                     icon: "success",
                     title: "El usuario con cedula " + formData.id + " ha sido registrado correctamente",
                     showConfirmButton: false,
                     timer: 5000
-                  });
+                });
                 onRegister();
-            }else{
+            } else {
                 Swal.fire({
                     icon: "error",
                     text: registerSuccess.message
                 });
             }
-            
-            
-        }catch(error){
+        } catch (error) {
             console.error('Error al registrarse:', error);
             Swal.fire({
                 icon: "error",
                 text: 'Error al registrarse'
-            });  
-
+            });
         }
-        
     };
 
     return (
+        console.log(grupos),
         <div className="tab-content">
             <div className="flex w-full h-screen bg-blue-200 ">
-                <div className="w-full  h-full flex items-center justify-center px-10 py-5 ">
+                <div className="w-full h-full flex items-center justify-center px-10 py-5 ">
                     <div className="max-w-[900px] px-10 py-0 rounded-3xl bg-white border-2 border-gray-100">
                         <div className="max-w-4xl mx-auto font-[sans-serif] text-[#333] p-6">
                             <div className="text-center mb-10">
@@ -121,21 +133,22 @@ const RegisterUsers = ({ onRegister }) => {
                                                 Grupo del Estudiante
                                             </label>
                                             <select
-                                            id="group"
-                                            name="group"
-                                            className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                                            {...register("group", {
-                                                required: "El grupo es requerido",
-                                            })}
-                                        >
-                                            <option value="Grupo 1">Grupo 1</option>
-                                            <option value="Grupo 2">Grupo 2</option>
-                                            <option value="Grupo 3">Grupo 3</option>
-                                            <option value="Grupo 4">Grupo 4</option>
-                                        </select>
-                                        {errors.group && (
-                                            <p className="text-red-500">{errors.group.message}</p>
-                                        )}
+                                                id="group"
+                                                name="group"
+                                                className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
+                                                {...register("group", {
+                                                    required: "El grupo es requerido",
+                                                })}
+                                            >
+                                                {grupos.map((grupo) => (
+                                                    <option key={grupo[0]} value={grupo[0]}>
+                                                        {grupo[1]}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {errors.group && (
+                                                <p className="text-red-500">{errors.group.message}</p>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -261,7 +274,7 @@ const RegisterUsers = ({ onRegister }) => {
                                 <div className="!mt-10">
                                     <button
                                         type="submit"
-                                        className=" btn btn-primary h-50% w-full active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01]  ease-in-out transform py-4 bg-blue-500 rounded-xl text-white font-bold text-lg"
+                                        className="btn btn-primary h-50% w-full active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01] ease-in-out transform py-4 bg-blue-500 rounded-xl text-white font-bold text-lg"
                                     >
                                         Registrarse
                                     </button>

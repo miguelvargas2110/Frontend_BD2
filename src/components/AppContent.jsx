@@ -6,7 +6,7 @@ import RegisterUsers from './RegisterUsers.jsx';
 import CreateQuiz from './CreateQuiz.jsx';
 
 const AppContent = () => {
-    const [componentToShow, setComponentToShow] = useState("login");
+    const [componentToShow, setComponentToShow] = useState("createQuiz");
 
     const onClickLoginApp = () => {
         setComponentToShow("login");

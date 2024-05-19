@@ -189,10 +189,10 @@ const CreateQuiz = ({onCreateQuiz}) => {
                       validate: (value) => {
                         if (value > cantidadTotalPreguntas) {
                             return "La cantidad de preguntas por estudiante no puede ser mayor a la cantidad total de preguntas.";
-                        }
-                        if (value <= 0) {
-                            return "La cantidad de preguntas por estudiante no puede ser menor a 1.";
-                        }
+                        }else if (value <= 0) {
+                          return "La cantidad de preguntas por estudiante no puede ser menor a 1.";
+                      }
+                        
                         return true;
                     },
                       pattern: {
