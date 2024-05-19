@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-const CreateQuiz = ({onCreateQuiz}) => {
+const CreateQuiz = ({ onCreateQuiz }) => {
   const {
     register,
     watch,
@@ -13,18 +13,17 @@ const CreateQuiz = ({onCreateQuiz}) => {
 
   const cantidadTotalPreguntas = watch("cantidadTotalPreguntas");
 
-
   const onSubmitCrearExamen = (data) => {
     onCreateQuiz(
-        data.nombreExamen,
-        data.descripcionExamen,
-        data.cantidadTotalPreguntas,
-        data.tiempoExamen,
-        data.group,
-        data.tema,
-        data.cantidadPreguntasEstudiante
+      data.nombreExamen,
+      data.descripcionExamen,
+      data.cantidadTotalPreguntas,
+      data.tiempoExamen,
+      data.group,
+      data.tema,
+      data.cantidadPreguntasEstudiante
     );
-};
+  };
 
   return (
     <div className="tab-content">
@@ -40,9 +39,7 @@ const CreateQuiz = ({onCreateQuiz}) => {
                     className="w-52 inline-block"
                   />
                 </a>
-                <h1 className="text-base font-semibold mt-5">
-                  CREAR EXAMEN
-                </h1>
+                <h1 className="text-base font-semibold mt-5">CREAR EXAMEN</h1>
               </div>
               <form onSubmit={handleSubmit(onSubmitCrearExamen)}>
                 <div className="mb-3 mt-2">
@@ -113,7 +110,7 @@ const CreateQuiz = ({onCreateQuiz}) => {
                     Tiempo para responder el examen
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     id="tiempoExamen"
                     name="tiempoExamen"
                     className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
@@ -122,7 +119,8 @@ const CreateQuiz = ({onCreateQuiz}) => {
                       required: "Por favor ingrese el tiempo.",
                       pattern: {
                         value: /^[0-9]*$/,
-                        message: "La tiempo debe darse solo en números positivos.",
+                        message:
+                          "La tiempo debe darse solo en números positivos.",
                       },
                     })}
                   />
@@ -154,9 +152,7 @@ const CreateQuiz = ({onCreateQuiz}) => {
                   )}
                 </div>
                 <div className="mb-3">
-                  <label className="text-lg font-medium">
-                    Tema del Examen
-                  </label>
+                  <label className="text-lg font-medium">Tema del Examen</label>
                   <select
                     id="tema"
                     name="tema"
@@ -187,19 +183,23 @@ const CreateQuiz = ({onCreateQuiz}) => {
                     {...register("cantidadPreguntasEstudiante", {
                       required: "Por favor ingrese la cantidad de preguntas.",
                       validate: (value) => {
-                        if (value > cantidadTotalPreguntas) {
-                            return "La cantidad de preguntas por estudiante no puede ser mayor a la cantidad total de preguntas.";
+                        const numericValue = Number(value);
+                        if (isNaN(numericValue)) {
+                          return "Por favor ingrese un número válido.";
                         }
-                        if (value <= 0) {
-                            return "La cantidad de preguntas por estudiante no puede ser menor a 1.";
+                        if (numericValue > cantidadTotalPreguntas) {
+                          return "La cantidad de preguntas por estudiante no puede ser mayor a la cantidad total de preguntas.";
+                        }
+                        if (numericValue <= 0) {
+                          return "La cantidad de preguntas por estudiante no puede ser menor a 1.";
                         }
                         return true;
-                    },
+                      },
+
                       pattern: {
                         value: /^[0-9]*$/,
                         message:
                           "La cantidad de preguntas debe darse solo en números positivos.",
-                          
                       },
                     })}
                   />
