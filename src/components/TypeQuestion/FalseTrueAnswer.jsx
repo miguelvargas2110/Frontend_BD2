@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-const FalseTrueAnswer = () => {
+const FalseTrueAnswer = ({ onOptionsChange }) => {
   const [options, setOptions] = useState([
     { id: 1, text: "Falso", correct: false },
     { id: 2, text: "Verdadero", correct: false },
@@ -12,6 +12,7 @@ const FalseTrueAnswer = () => {
       option.id === id ? { ...option, text: newText } : option
     );
     setOptions(updatedOptions);
+    onOptionsChange(updatedOptions);
   };
 
   const handleCorrectOptionChange = (id) => {
@@ -22,6 +23,7 @@ const FalseTrueAnswer = () => {
     );
     setOptions(updatedOptions);
     setCorrectOption(id);
+    onOptionsChange(updatedOptions);
   };
 
   return (
@@ -35,12 +37,14 @@ const FalseTrueAnswer = () => {
               className="w-5 h-5 mr-2"
               checked={correctOption === option.id}
               onChange={() => handleCorrectOptionChange(option.id)}
+              
             />
             <input
               type="text"
               placeholder={option.text}
               className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 text-gray-500"
               value={option.text}
+              readOnly
               onChange={(e) =>
                 handleOptionTextChange(option.id, e.target.value)
               }

@@ -4,9 +4,10 @@ import MainMenu from './MainMenu';
 import Swal from 'sweetalert2';
 import RegisterUsers from './RegisterUsers.jsx';
 import CreateQuiz from './CreateQuiz.jsx';
+import CreateQuestionsQuiz from './CreateQuestionQuiz.jsx';
 
 const AppContent = () => {
-    const [componentToShow, setComponentToShow] = useState("createQuiz");
+    const [componentToShow, setComponentToShow] = useState("createQuestionQuiz");
 
     const onClickLoginApp = () => {
         setComponentToShow("login");
@@ -37,6 +38,7 @@ const AppContent = () => {
         {componentToShow === "register" && <RegisterUsers onRegister={onRegister}/>}
         {componentToShow === "messages" && <AuthContent />}
         {componentToShow === "createQuiz" && <CreateQuiz onCreateQuiz={onCreateQuiz}/>}
+        {componentToShow === "createQuestionQuiz" && <CreateQuestionsQuiz/>}
 
 
       </>

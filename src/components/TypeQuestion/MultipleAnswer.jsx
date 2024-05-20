@@ -1,14 +1,27 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-const MultipleAnswer = () => {
+const MultipleAnswer = ({ onOptionsChange }) => {
   const [options, setOptions] = useState([
-    { id: 1, text: "Opción 1", correct: false },
-    { id: 2, text: "Opcion 2", correct: false },
+    { id: 1, text: "", correct: false },
+    { id: 2, text: "", correct: false },
   ]);
 
   const addOption = () => {
-    const newOption = { id: options.length + 1, text: "Opcion n", correct: false };
+    const newOption = {
+      id: options.length + 1,
+      text: "",
+      correct: false,
+    };
     setOptions([...options, newOption]);
+    onOptionsChange([...options, newOption]);
+  };
+
+  const deleteLastOption = () => {
+    if (options.length > 2) {
+      const updatedOptions = options.slice(0, options.length - 1);
+      setOptions(updatedOptions);
+      onOptionsChange(updatedOptions);
+    }
   };
 
   const handleOptionTextChange = (id, newText) => {
@@ -16,6 +29,7 @@ const MultipleAnswer = () => {
       option.id === id ? { ...option, text: newText } : option
     );
     setOptions(updatedOptions);
+    onOptionsChange(updatedOptions);
   };
 
   const handleCorrectOptionChange = (id) => {
@@ -23,6 +37,7 @@ const MultipleAnswer = () => {
       option.id === id ? { ...option, correct: !option.correct } : option
     );
     setOptions(updatedOptions);
+    onOptionsChange(updatedOptions);
   };
 
   return (
@@ -39,9 +54,9 @@ const MultipleAnswer = () => {
             />
             <input
               type="text"
-              placeholder={option.text}
-              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 text-gray-500"
-              value={option.text}
+              placeholder={"Opcion"}
+              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 text-gray-500 rounded-lg"
+              
               onChange={(e) =>
                 handleOptionTextChange(option.id, e.target.value)
               }
@@ -49,12 +64,22 @@ const MultipleAnswer = () => {
           </label>
         </div>
       ))}
-      <button
-        onClick={addOption}
-        className="text-indigo-500 hover:underline mb-4"
-      >
-        Agregar otra opción
-      </button>
+      <div className="flex justify-between mb-4">
+        <button
+          onClick={addOption}
+          className="text-indigo-500 hover:underline"
+          type="button"
+        >
+          Agregar otra opción
+        </button>
+        <button
+          onClick={deleteLastOption}
+          className="text-red-500 hover:underline"
+          type="button"
+        >
+          Eliminar última opción
+        </button>
+      </div>
     </div>
   );
 };

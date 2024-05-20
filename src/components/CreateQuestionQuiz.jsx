@@ -1,37 +1,132 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import Question from "./Question";
+import Swal from "sweetalert2";
+import QuestionTeacherModal from "./QuestionsTeacherModal";
 
-const CreateQuestionsQuiz = ({onCrearQuestions}) => {
+const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
   const {
     register,
-    watch,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [questions, setQuestions] = useState([{ id: 1, questionData: {} }]);
 
-  const [questions, setQuestions] = useState([]);
+  const handleAddQuestion = () => {
+    const newId = questions.length + 1;
+    setQuestions([...questions, { id: newId, questionData: {} }]);
+  };
 
-  const cantidadTotalPreguntas = watch("cantidadTotalPreguntas");
+  const handleRemoveQuestion = () => {
+    if (questions.length > 1) {
+      setQuestions(questions.slice(0, -1));
+    }
+  };
 
+  const handleQuestionChange = (id, updatedQuestion) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((q) =>
+        q.id === id ? { ...q, questionData: updatedQuestion } : q
+      )
+    );
+  };
+
+  const validateQuestions = () => {
+    let totalPorcentaje = 0;
+    for (const q of questions) {
+      const { pregunta, valorPorcentaje, tipo_pregunta, opciones } = q.questionData;
+      totalPorcentaje += Number(valorPorcentaje);
+
+      if (!pregunta || pregunta.trim() === "") {
+        Swal.fire({
+          icon: "error",
+          text: `La pregunta ${q.id} debe tener un enunciado.`,
+        });
+        return false;
+      }
+
+      if (!valorPorcentaje || Number(valorPorcentaje) <= 0) {
+        Swal.fire({
+          icon: "error",
+          text: `La pregunta ${q.id} debe tener un porcentaje mayor a 0.`,
+        });
+        return false;
+      }
+
+      if (opciones) {
+        for (const option of opciones) {
+          if (!option.text || option.text.trim() === "") {
+            Swal.fire({
+              icon: "error",
+              text: `La opción ${option.id} de la pregunta ${q.id} no puede estar vacía.`,
+            });
+            return false;
+          }
+        }
+      }
+
+      if (["Respuesta Unica", "Respuesta Multiple", "Falso - verdadero"].includes(tipo_pregunta)) {
+        if (!opciones || opciones.length === 0 || !opciones.some((option) => option.correct)) {
+          Swal.fire({
+            icon: "error",
+            text: `La pregunta ${q.id} debe tener al menos una opción correcta.`,
+          });
+          return false;
+        }
+      }
+
+      if (tipo_pregunta === "Emparejar Conceptos") {
+        if (!opciones || opciones.length === 0 || !opciones.every((option) => option.correct)) {
+          Swal.fire({
+            icon: "error",
+            text: `La pregunta ${q.id} debe tener opciones emparejadas.`,
+          });
+          return false;
+        }
+      }
+    }
+    if (totalPorcentaje > 100) {
+      Swal.fire({
+        icon: "error",
+        text: "La suma de los porcentajes de las preguntas no puede ser mayor a 100.",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleSelectQuestion = (question) => {
+    setSelectedQuestion(question);
+  };
+
+  const handleClearSelectedQuestion = () => {
+    setSelectedQuestion(null);
+  };
 
   const onSubmitCrearExamen = (data) => {
-    onCrearQuestions(
+    if (validateQuestions()) {
+      onCrearQuestions(
         data.nombreExamen,
         data.descripcionExamen,
         data.cantidadTotalPreguntas,
         data.tiempoExamen,
         data.group,
         data.tema,
-        data.cantidadPreguntasEstudiante
-    );
-};
+        data.cantidadPreguntasEstudiante,
+        questions.map((q) => q.questionData)
+      );
+    }
+  };
 
   return (
     <div className="tab-content">
-      <div className="flex w-full h-full bg-blue-200 ">
-        <div className="w-full  h-full flex items-center justify-center px-10 py-5 ">
-          <div className="max-w-[900px] px-10 py-0 rounded-3xl bg-white border-2 border-gray-100">
-            <div className="max-w-4xl mx-auto font-[sans-serif] text-[#333] p-6">
+      <div className="flex w-full h-full bg-blue-200">
+        <div className="w-full h-full flex items-center justify-center px-10 py-5">
+          <div
+            className="w-full px-2 py-0 rounded-3xl bg-white border-2 border-gray-100"
+            style={{ maxWidth: "90%" }}
+          >
+            <div className="mx-auto font-[sans-serif] text-[#333] p-6">
               <div className="text-center mb-10">
                 <a href="#">
                   <img
@@ -45,174 +140,37 @@ const CreateQuestionsQuiz = ({onCrearQuestions}) => {
                 </h1>
               </div>
               <form onSubmit={handleSubmit(onSubmitCrearExamen)}>
-                <div className="mb-3 mt-2">
-                  <label htmlFor="nombreExamen" className="text-lg font-medium">
-                    Nombre del Examen
-                  </label>
-                  <input
-                    id="nombreExamen"
-                    name="nombreExamen"
-                    placeholder="Ingresa el nombre del examen"
-                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                    {...register("nombreExamen", {
-                      required: "El nombre del examen es requerido",
-                    })}
-                  ></input>
-                  {errors.nombreExamen && (
-                    <p className="text-red-500">
-                      {errors.nombreExamen.message}
-                    </p>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label className="text-lg font-medium">
-                    Descripcion del examen
-                  </label>
-                  <textarea
-                    id="descripcionExamen"
-                    name="descripcionExamen"
-                    placeholder="Ingresa la Descripcion del examen"
-                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                    {...register("descripcionExamen", {
-                      required: "La descripcion es requerida",
-                    })}
-                  ></textarea>
-                  {errors.descripcionExamen && (
-                    <p className="text-red-500">
-                      {errors.descripcionExamen.message}
-                    </p>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label className="text-lg font-medium">
-                    Cantidad total de preguntas
-                  </label>
-                  <input
-                    type="number"
-                    id="cantidadTotalPreguntas"
-                    name="cantidadTotalPreguntas"
-                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                    placeholder="Ingresa la cantidad Total de Preguntas"
-                    {...register("cantidadTotalPreguntas", {
-                      required: "Por favor ingrese la cantidad de preguntas.",
-                      pattern: {
-                        value: /^[0-9]*$/,
-                        message:
-                          "La cantidad de preguntas debe darse solo en números positivos.",
-                      },
-                    })}
+                {/* <QuestionTeacherModal
+                  onSelectQuestion={(question) => console.log("Question selected:", question)}
+                  closeModal={() => console.log("Closing modal")}
+                /> */}
+                {questions.map((q) => (
+                  <Question
+                    key={q.id}
+                    questionId={q.id}
+                    onQuestionChange={handleQuestionChange}
                   />
-                  {errors.cantidadTotalPreguntas && (
-                    <p className="text-red-500">
-                      {errors.cantidadTotalPreguntas.message}
-                    </p>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label className="text-lg font-medium">
-                    Tiempo para responder el examen
-                  </label>
-                  <input
-                    type="number"
-                    id="tiempoExamen"
-                    name="tiempoExamen"
-                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                    placeholder="Ingresa el tiempo en minutos para responder el examen"
-                    {...register("tiempoExamen", {
-                      required: "Por favor ingrese el tiempo.",
-                      pattern: {
-                        value: /^[0-9]*$/,
-                        message: "La tiempo debe darse solo en números positivos.",
-                      },
-                    })}
-                  />
-                  {errors.tiempoExamen && (
-                    <p className="text-red-500">
-                      {errors.tiempoExamen.message}
-                    </p>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label className="text-lg font-medium">
-                    Grupo del Estudiante
-                  </label>
-                  <select
-                    id="group"
-                    name="group"
-                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                    {...register("group", {
-                      required: "El grupo es requerido",
-                    })}
+                ))}
+                <div className="flex justify-between mt-4">
+                  <button
+                    type="button"
+                    onClick={handleAddQuestion}
+                    className="text-blue-500 hover:underline"
                   >
-                    <option value="Grupo 1">Grupo 1</option>
-                    <option value="Grupo 2">Grupo 2</option>
-                    <option value="Grupo 3">Grupo 3</option>
-                    <option value="Grupo 4">Grupo 4</option>
-                  </select>
-                  {errors.group && (
-                    <p className="text-red-500">{errors.group.message}</p>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label className="text-lg font-medium">
-                    Tema del Examen
-                  </label>
-                  <select
-                    id="tema"
-                    name="tema"
-                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                    {...register("tema", {
-                      required: "El tema es requerido",
-                    })}
+                    Agregar Pregunta
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveQuestion}
+                    className="text-red-500 hover:underline"
                   >
-                    <option value="Triggers">Triggers</option>
-                    <option value="Cursores">Cursores</option>
-                    <option value="Funciones">Funciones</option>
-                    <option value="Procedimiento">Procedimiento</option>
-                  </select>
-                  {errors.tema && (
-                    <p className="text-red-500">{errors.tema.message}</p>
-                  )}
+                    Eliminar Pregunta
+                  </button>
                 </div>
-                <div className="mb-3">
-                  <label className="text-lg font-medium">
-                    Cantidad de preguntas por Estudiante
-                  </label>
-                  <input
-                    type="number"
-                    id="cantidadPreguntasEstudiante"
-                    name="cantidadPreguntasEstudiante"
-                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                    placeholder="Ingresa la cantidad preguntas por Estudiante"
-                    {...register("cantidadPreguntasEstudiante", {
-                      required: "Por favor ingrese la cantidad de preguntas.",
-                      validate: (value) => {
-                        if (value > cantidadTotalPreguntas) {
-                            return "La cantidad de preguntas por estudiante no puede ser mayor a la cantidad total de preguntas.";
-                        }
-                        if (value <= 0) {
-                            return "La cantidad de preguntas por estudiante no puede ser menor a 1.";
-                        }
-                        return true;
-                    },
-                      pattern: {
-                        value: /^[0-9]*$/,
-                        message:
-                          "La cantidad de preguntas debe darse solo en números positivos.",
-                          
-                      },
-                    })}
-                  />
-                  {errors.cantidadPreguntasEstudiante && (
-                    <p className="text-red-500">
-                      {errors.cantidadPreguntasEstudiante.message}
-                    </p>
-                  )}
-                </div>
-                <div className="!mt-10">
+                <div className="mt-10">
                   <button
                     type="submit"
-                    className=" btn btn-primary h-50% w-full active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01]  ease-in-out transform py-4 bg-blue-500 rounded-xl text-white font-bold text-lg"
+                    className="btn btn-primary h-50% w-full active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01] ease-in-out transform py-4 bg-blue-500 rounded-xl text-white font-bold text-lg"
                   >
                     Crear Examen
                   </button>
@@ -225,4 +183,5 @@ const CreateQuestionsQuiz = ({onCrearQuestions}) => {
     </div>
   );
 };
+
 export default CreateQuestionsQuiz;
