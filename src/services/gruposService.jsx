@@ -8,15 +8,34 @@ const grupoServices = {
         try {
             const response = await axios.get(`${BASE_URL}/ejemplos/listarGrupos`, {
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
-              });
-            if(response.status === 200){
-                return {success: true, message: response.data.respuesta}
-            }else{
-                return {success: false, message: 'La solicitud al servidor no fue exitosa'};
-            }} catch (error) {
-            return {success: false, message: error.response.data.error};
+            });
+            if (response.status === 200) {
+                return { success: true, message: response.data.respuesta }
+            } else {
+                return { success: false, message: 'La solicitud al servidor no fue exitosa' };
+            }
+        } catch (error) {
+            return { success: false, message: error.response.data.error };
+        }
+    },
+
+    obtenerGruposProfesor: async (idProfesor) => {
+        try {
+            const response = await axios.post(`${BASE_URL}/ejemplos/listarGruposProfesor`, idProfesor, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log(response);
+            if (response.status === 200) {
+                return { success: true, message: response.data.respuesta }
+            } else {
+                return { success: false, message: 'La solicitud al servidor no fue exitosa' };
+            }
+        } catch (error) {
+            return { success: false, message: error.response.data.error };
         }
     },
 

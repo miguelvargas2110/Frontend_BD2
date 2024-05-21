@@ -7,7 +7,7 @@ const CreateQuiz = ({ onCreateQuiz }) => {
     watch,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm();  
 
   const [questions, setQuestions] = useState([]);
 
@@ -142,10 +142,11 @@ const CreateQuiz = ({ onCreateQuiz }) => {
                       required: "El grupo es requerido",
                     })}
                   >
-                    <option value="Grupo 1">Grupo 1</option>
-                    <option value="Grupo 2">Grupo 2</option>
-                    <option value="Grupo 3">Grupo 3</option>
-                    <option value="Grupo 4">Grupo 4</option>
+                    {grupos.map((grupo) => (
+                      <option key={grupo[0]} value={grupo[0]}>
+                        {grupo[1]}
+                      </option>
+                    ))}
                   </select>
                   {errors.group && (
                     <p className="text-red-500">{errors.group.message}</p>

@@ -4,6 +4,7 @@ import UniqueAnswer from "./TypeQuestion/UniqueAnswer";
 import MultipleAnswer from "./TypeQuestion/MultipleAnswer";
 import FalseTrueAnswer from "./TypeQuestion/FalseTrueAnswer";
 import MatchConcepts from "./TypeQuestion/MatchConcepts";
+import tipoPregunta from "../services/tipoPreguntaService";
 
 const Question = ({ questionId, onQuestionChange, initialData }) => {
   const { register, watch, handleSubmit, formState: { errors } } = useForm();
@@ -22,18 +23,22 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
     setOptions(updatedOptions);
   };
 
-  const tiposPregunta = [
-    "Respuesta Unica",
-    "Respuesta Multiple",
-    "Falso - Verdadero",
-    "Emparejar Conceptos",
-  ];
+  const [tiposPregunta, setTipoPreguntas] = useState([]);
 
   const [showComponentQuestion, setshowComponentQuestion] = useState(
     <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange}  initialOptions={initialData.opciones}/>
   );
 
   useEffect(() => {
+    const fetchTipoPregunta = async () => {
+      const response = await tipoPregunta.obtenertipoPregunta();
+      if (response.success) {
+        setTipoPreguntas(response.message);
+      }else{
+        console.error('Error al obtener tipo de preguntas:', response.message);
+      }
+    };
+    fetchTipoPregunta();
     if (initialData.tipo_pregunta === "Respuesta Unica") {
       setshowComponentQuestion(
         <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange} />
@@ -54,22 +59,22 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
   }, []);
 
   const handleTipoPregunta = (e) => {
-    const selectedTipoPregunta = e.target.value;
+    const selectedTipoPregunta = Number(e.target.value);
     setQuestion((prev) => ({ ...prev, tipo_pregunta: selectedTipoPregunta }));
     setQuestion((prev) => ({ ...prev, opciones: []}));
-    if (selectedTipoPregunta === "Respuesta Unica") {
+    if (selectedTipoPregunta === 1) {
       setshowComponentQuestion(
         <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange} />
       );
-    } else if (selectedTipoPregunta === "Respuesta Multiple") {
+    } else if (selectedTipoPregunta === 2) {
       setshowComponentQuestion(
         <MultipleAnswer onOptionsChange={handleOptionsChange} />
       );
-    } else if (selectedTipoPregunta === "Falso -Verdadero") {
+    } else if (selectedTipoPregunta === 3) {
       setshowComponentQuestion(
         <FalseTrueAnswer onOptionsChange={handleOptionsChange} />
       );
-    } else if (selectedTipoPregunta === "Emparejar Conceptos") {
+    } else if (selectedTipoPregunta === 4) {
       setshowComponentQuestion(
         <MatchConcepts onOptionsChange={handleOptionsChange} />
       );
@@ -116,9 +121,9 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
           value={question.tipo_pregunta}
           onChange={handleTipoPregunta}
         >
-          {tiposPregunta.map((opcion, index) => (
-            <option key={index} value={opcion}>
-              {opcion}
+          {tiposPregunta.map((tipo_pregunta) => (
+            <option key={tipo_pregunta[0]} value={tipo_pregunta[0]}>
+              {tipo_pregunta[1]}
             </option>
           ))}
         </select>

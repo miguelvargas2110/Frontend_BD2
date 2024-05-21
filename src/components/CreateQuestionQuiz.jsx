@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Question from "./Question";
 import Swal from "sweetalert2";
 import QuestionsTeacherModal from "./QuestionsTeacherModal";
 import QuestionsPublicModal from "./QuestionsPublicModal";
+import grupoServices from "../services/gruposService";
+import temasService from "../services/temasService";
+import tipoPregunta from "../services/tipoPreguntaService";
 
 const CreateQuestionsQuiz = ({ onCrearExamen }) => {
   const {
@@ -12,6 +15,47 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
     watch,
     formState: { errors },
   } = useForm();
+
+  const [grupos, setGrupos] = useState([]); // Inicializa grupos como un array vacío
+  const [temas, setTemas] = useState([]); // Nuevo estado para los temas
+  const [tipoPreguntas, setTipoPreguntas] = useState([]); // Nuevo estado para los tipos de preguntas
+
+  useEffect(() => {
+    const fetchGrupos = async () => {
+      const response = await grupoServices.obtenerGruposProfesor(localStorage.getItem('id'));
+      if (response.success) {
+        setGrupos(response.message);
+        fetchTemas(response.message[0][0]); // Llamar a fetchTemas con el primer grupo
+      } else {
+        console.error('Error al obtener grupos:', response.message);
+      }
+    };
+    fetchGrupos();
+    const fetchTipoPregunta = async () => {
+      const response = await tipoPregunta.obtenertipoPregunta();
+      if (response.success) {
+        setTipoPreguntas(response.message);
+      }else{
+        console.error('Error al obtener tipo de preguntas:', response.message);
+      }
+    };
+    fetchTipoPregunta();
+  }, []);
+
+  const fetchTemas = async (idGrupo) => {
+    const response = await temasService.obtenerTemas(idGrupo);
+    if (response.success) {
+      setTemas(response.message); // Asigna los temas al estado
+    } else {
+      console.error('Error al obtener temas:', response.message);
+    }
+  };
+
+  const handleGroupChange = (event) => {
+    const selectedGroup = event.target.value;
+    fetchTemas(selectedGroup); // Llamar a fetchTemas con el grupo seleccionado
+  };
+
   const [questions, setQuestions] = useState([{ id: 1, questionData: {} }]);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -279,7 +323,7 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
                 </div>
                 <div className="mb-3">
                   <label className="text-lg font-medium">
-                    Grupo del Estudiante
+                    Grupos del profesor
                   </label>
                   <select
                     id="group"
@@ -288,11 +332,13 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
                     {...register("group", {
                       required: "El grupo es requerido",
                     })}
+                    onChange={handleGroupChange}
                   >
-                    <option value="Grupo 1">Grupo 1</option>
-                    <option value="Grupo 2">Grupo 2</option>
-                    <option value="Grupo 3">Grupo 3</option>
-                    <option value="Grupo 4">Grupo 4</option>
+                    {grupos.map((grupo) => (
+                      <option key={grupo[0]} value={grupo[0]}>
+                        {grupo[1]}
+                      </option>
+                    ))}
                   </select>
                   {errors.group && (
                     <p className="text-red-500">{errors.group.message}</p>
@@ -308,10 +354,11 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
                       required: "El tema es requerido",
                     })}
                   >
-                    <option value="Triggers">Triggers</option>
-                    <option value="Cursores">Cursores</option>
-                    <option value="Funciones">Funciones</option>
-                    <option value="Procedimiento">Procedimiento</option>
+                    {temas.map((tema) => (
+                      <option key={tema[0]} value={tema[0]}>
+                        {tema[1]}
+                      </option>
+                    ))}
                   </select>
                   {errors.tema && (
                     <p className="text-red-500">{errors.tema.message}</p>
