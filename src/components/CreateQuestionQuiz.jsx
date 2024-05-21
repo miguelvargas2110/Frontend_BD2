@@ -75,7 +75,14 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
   };
 
   const handleRemoveQuestion = (id) => {
-    setQuestions((prevQuestions) => prevQuestions.filter((q) => q.id !== id));
+    setQuestions((prevQuestions) => {
+      const filteredQuestions = prevQuestions.filter((q) => q.id !== id);
+      return filteredQuestions.map((q, index) => ({
+        ...q,
+        id: index + 1,
+      }));
+    });
+
     Swal.fire({
       icon: "success",
       text: `La pregunta fue eliminada`,
@@ -223,7 +230,7 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
           >
             <div className="mx-auto font-[sans-serif] text-[#333] p-6">
               <div className="text-center mb-10">
-                <a href="#">
+                <a >
                   <img
                     src="https://res.cloudinary.com/dgp8hrrbj/image/upload/v1715982390/esbmqo746arulx4wywer.png"
                     alt="logo"
@@ -416,6 +423,15 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
                       onQuestionChange={handleQuestionChange}
                       initialData={q.questionData}
                     />
+                    <div className="p-6 max-w-3xl mx-auto mb-3">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveQuestion(q.id)}
+                        className="text-red-500 hover:underline"
+                      >
+                        Eliminar Pregunta
+                      </button>
+                    </div>
                   </div>
                 ))}
                 <div className="flex justify-between mt-4">
@@ -440,13 +456,6 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
                   >
                     Agregar Pregunta de Banco Privado
                   </button>
-                  <button
-                        type="button"
-                        onClick={() => handleRemoveQuestion(q.id)}
-                        className="text-red-500 hover:underline"
-                      >
-                        Eliminar Pregunta
-                      </button>
                 </div>
                 <div className="mt-10">
                   <button
