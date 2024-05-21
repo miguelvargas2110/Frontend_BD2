@@ -9,7 +9,7 @@ const HeaderMain = ({ onClickLogin, onClickNavigate }) => {
     console.log(isMenuOpen);
   };
 
-  const isProfesor = localStorage.getItem("profesor");
+  const isProfesor = localStorage.getItem("rol").includes("Profesor");
 
   const onViewExam = () => {
     onClickNavigate("createQuestionsQuiz");

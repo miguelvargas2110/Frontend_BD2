@@ -26,8 +26,8 @@ const AppContent = () => {
         setComponentToShow("login");
     };
 
-    const onCrearExamen = (nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante, questions) => {
-        console.log(nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante, questions);
+    const onCrearExamen = () => {
+        setComponentToShow("welcome")
     };
 
     return (
