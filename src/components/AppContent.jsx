@@ -7,11 +7,10 @@ import CreateQuiz from './CreateQuiz.jsx';
 import CreateQuestionsQuiz from './CreateQuestionQuiz.jsx';
 
 const AppContent = () => {
-    const [componentToShow, setComponentToShow] = useState("createQuestionsQuiz");
+    const [componentToShow, setComponentToShow] = useState("welcome");
 
-    const onClickLoginApp = () => {
-        setComponentToShow("login");
-        
+    const navigateTo = (componentName) => {
+        setComponentToShow(componentName);
     };
 
     const logout = () => {
@@ -24,8 +23,8 @@ const AppContent = () => {
     };
 
     const onRegister = () => {
-       setComponentToShow("login");
-    }; 
+        setComponentToShow("login");
+    };
 
     const onCrearExamen = (nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante, questions) => {
         console.log(nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante, questions);
@@ -33,14 +32,12 @@ const AppContent = () => {
 
     return (
       <>
-        {componentToShow === "welcome" && <MainMenu onClickLogin={onClickLoginApp}/> }
-        {componentToShow === "login" && <LoginForm  onLogin={onLogin} />}
-        {componentToShow === "register" && <RegisterUsers onRegister={onRegister}/>}
+        {componentToShow === "welcome" && <MainMenu onClickNavigate={navigateTo} />}
+        {componentToShow === "login" && <LoginForm onLogin={onLogin} />}
+        {componentToShow === "register" && <RegisterUsers onRegister={onRegister} />}
         {componentToShow === "messages" && <AuthContent />}
-        {componentToShow === "createQuiz" && <CreateQuiz onCreateQuiz={onCreateQuiz}/>}
-        {componentToShow === "createQuestionsQuiz" && <CreateQuestionsQuiz onCrearExamen = {onCrearExamen}/>}
-
-
+        {componentToShow === "createQuiz" && <CreateQuiz onCreateQuiz={onCreateQuiz} />}
+        {componentToShow === "createQuestionsQuiz" && <CreateQuestionsQuiz onCrearExamen={onCrearExamen} />}
       </>
     );
 };

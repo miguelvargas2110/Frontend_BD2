@@ -29,16 +29,13 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
       });
     }
   };
-  
 
-  const handleRemoveQuestion = () => {
-    if (questions.length > 1) {
-      setQuestions(questions.slice(0, -1));
-      Swal.fire({
-        icon: "success",
-        text: `La pregunta fue eliminada  `,
-      });
-    }
+  const handleRemoveQuestion = (id) => {
+    setQuestions((prevQuestions) => prevQuestions.filter((q) => q.id !== id));
+    Swal.fire({
+      icon: "success",
+      text: `La pregunta fue eliminada`,
+    });
   };
 
   const handleQuestionChange = (id, updatedQuestion) => {
@@ -144,13 +141,12 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
 
   const handleSelectQuestion = (question) => {
     if (Number(cantidadTotalPreguntas) > questions.length) {
-    const newId = questions.length + 1;
-    const { id, ...questionDataWithoutId } = question;
-    const newQuestion = { id: newId, questionData: questionDataWithoutId };
-    setQuestions([...questions, newQuestion]);
-    setShowModal(false);
-    }
-    else{
+      const newId = questions.length + 1;
+      const { id, ...questionDataWithoutId } = question;
+      const newQuestion = { id: newId, questionData: questionDataWithoutId };
+      setQuestions([...questions, newQuestion]);
+      setShowModal(false);
+    } else {
       setShowModal(false);
       Swal.fire({
         icon: "error",
@@ -190,9 +186,7 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
                     className="w-52 inline-block"
                   />
                 </a>
-                <h1 className="text-base font-semibold mt-5">
-                  EXAMEN
-                </h1>
+                <h1 className="text-base font-semibold mt-5">EXAMEN</h1>
               </div>
               <form onSubmit={handleSubmit(onSubmitCrearExamen)}>
                 <div className="mb-3 mt-2">
@@ -368,12 +362,14 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
                   </h1>
                 </div>
                 {questions.map((q) => (
-                  <Question
-                    key={q.id}
-                    questionId={q.id}
-                    onQuestionChange={handleQuestionChange}
-                    initialData={q.questionData}
-                  />
+                  <div key={q.id}>
+                    <Question
+                      key={q.id}
+                      questionId={q.id}
+                      onQuestionChange={handleQuestionChange}
+                      initialData={q.questionData}
+                    />
+                  </div>
                 ))}
                 <div className="flex justify-between mt-4">
                   <button
@@ -398,12 +394,12 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
                     Agregar Pregunta de Banco Privado
                   </button>
                   <button
-                    type="button"
-                    onClick={handleRemoveQuestion}
-                    className="text-red-500 hover:underline"
-                  >
-                    Eliminar Pregunta
-                  </button>
+                        type="button"
+                        onClick={() => handleRemoveQuestion(q.id)}
+                        className="text-red-500 hover:underline"
+                      >
+                        Eliminar Pregunta
+                      </button>
                 </div>
                 <div className="mt-10">
                   <button

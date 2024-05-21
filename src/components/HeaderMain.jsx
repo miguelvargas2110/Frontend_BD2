@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const HeaderMain = ({ onClickLogin }) => {
+const HeaderMain = ({}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLoginClick = () => {
