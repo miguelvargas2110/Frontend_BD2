@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const MatchConcepts = ({ onOptionsChange }) => {
-  const [options, setOptions] = useState([
+const MatchConcepts = ({ onOptionsChange, initialOptions }) => {
+  const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: "" },
     { id: 2, text: "", correct: "" },
   ]);
@@ -12,25 +12,32 @@ const MatchConcepts = ({ onOptionsChange }) => {
       text: "",
       correct: "",
     };
-    setOptions([...options, newOption]);
-    onOptionsChange([...options, newOption]);
+    const updatedOptions = [...options, newOption];
+    setOptions(updatedOptions);
+    onOptionsChange(updatedOptions);
   };
 
   const deleteLastPair = () => {
     if (options.length > 2) {
-      const updateOptions = options.slice(0, options.length - 1);
-      setOptions(updateOptions);
-      onOptionsChange(updateOptions);
+      const updatedOptions = options.slice(0, options.length - 1);
+      setOptions(updatedOptions);
+      onOptionsChange(updatedOptions);
     }
   };
 
-  const handleConceptChange = (id, newtext, newcorrect) => {
-    const updateOptions = options.map((pair) =>
-      pair.id === id ? { ...pair, text: newtext, correct: newcorrect } : pair
+  const handleConceptChange = (id, newText, newCorrect) => {
+    const updatedOptions = options.map((pair) =>
+      pair.id === id ? { ...pair, text: newText, correct: newCorrect } : pair
     );
-    setOptions(updateOptions);
-    onOptionsChange(updateOptions);
+    setOptions(updatedOptions);
+    onOptionsChange(updatedOptions);
   };
+
+  useEffect(() => {
+    if (initialOptions) {
+      setOptions(initialOptions);
+    }
+  }, [initialOptions]);
 
   return (
     <div>
@@ -43,8 +50,9 @@ const MatchConcepts = ({ onOptionsChange }) => {
             <input
               type="text"
               placeholder="Concepto"
-              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 text-gray-500 mr-2 rounded-lg"
+              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 mr-2 rounded-lg"
               required
+              value={pair.text}
               onChange={(e) =>
                 handleConceptChange(pair.id, e.target.value, pair.correct)
               }
@@ -53,8 +61,9 @@ const MatchConcepts = ({ onOptionsChange }) => {
             <input
               type="text"
               placeholder="Emparejar"
-              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 text-gray-500 rounded-lg"
+              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg"
               required
+              value={pair.correct}
               onChange={(e) =>
                 handleConceptChange(pair.id, pair.text, e.target.value)
               }

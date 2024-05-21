@@ -1,52 +1,26 @@
 import React, { useState } from "react";
 
-const QuestionsTeacherModal = ({ onSelectQuestion, closeModal }) => {
+const QuestionsPublicModal = ({ onSelectQuestion, closeModal }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [questions, setQuestions] = useState([
     {
       id: 1,
-      pregunta: "¿Cuál es la capital de Francia?",
-      tipo_pregunta: "Respuesta Unica",
+      pregunta: "¿Cuál es la capital de España?",
+      tipo_pregunta: "Respuesta Multiple",
       opciones: [
-        { id: 1, text: "Paris", correct: true },
-        { id: 2, text: "Monaco", correct: false },
+        { id: 1, text: "Madrid", correct: true },
+        { id: 2, text: "Barcelona", correct: false },
       ],
-      privacidad: true,
+      privacidad: false,
       valorPorcentaje: 10,
     },
     {
       id: 2,
-      pregunta: "¿Cuánto es 2 + 2?",
-      tipo_pregunta: "Respuesta Multiple",
-      opciones: [
-        { id: 1, text: "3", correct: false },
-        { id: 2, text: "5", correct: false },
-        { id: 3, text: "4", correct: true },
-      ],
-      privacidad: true,
-      valorPorcentaje: 10,
-    },
-    {
-      id: 3,
-      pregunta: "¿Cuánto es 2 + 2?",
-      tipo_pregunta: "Falso - Verdadero",
-      opciones: [
-        { id: 1, text: "Verdadero", correct: false },
-        { id: 2, text: "Falso", correct: true },
-      ],
-      privacidad: true,
-      valorPorcentaje: 10,
-    },
-    {
-      id: 4,
-      pregunta: "¿Cuánto es 2 + 2?",
-      tipo_pregunta: "Emparejar Conceptos",
-      opciones: [
-        { id: 1, text: "2", correct: "sapo" },
-        { id: 2, text: "3", correct: "sapo x2" },
-      ],
-      privacidad: true,
+      pregunta: "¿Cuánto es 3 + 3?",
+      tipo_pregunta: "Respuesta Unica",
+      opciones: [],
+      privacidad: false,
       valorPorcentaje: 10,
     },
   ]);
@@ -101,18 +75,15 @@ const QuestionsTeacherModal = ({ onSelectQuestion, closeModal }) => {
           </table>
         </div>
         <button
-        type="button"
-        onClick={closeModal}
-        className="px-6 py-2.5 w-full rounded-md text-white text-sm font-semibold border-none outline-none bg-red-500 hover:bg-red-600 active:bg-red-500 mt-4"
-      >
-        Cerrar
-      </button>
+          type="button"
+          onClick={closeModal}
+          className="px-6 py-2.5 w-full rounded-md text-white text-sm font-semibold border-none outline-none bg-red-500 hover:bg-red-600 active:bg-red-500 mt-4"
+        >
+          Cerrar
+        </button>
       </div>
-      <div className="text-right space-x-4"></div>
-      
-      
     </div>
   );
 };
 
-export default QuestionsTeacherModal;
+export default QuestionsPublicModal;

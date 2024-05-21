@@ -7,7 +7,7 @@ import CreateQuiz from './CreateQuiz.jsx';
 import CreateQuestionsQuiz from './CreateQuestionQuiz.jsx';
 
 const AppContent = () => {
-    const [componentToShow, setComponentToShow] = useState("createQuestionQuiz");
+    const [componentToShow, setComponentToShow] = useState("createQuestionsQuiz");
 
     const onClickLoginApp = () => {
         setComponentToShow("login");
@@ -27,8 +27,8 @@ const AppContent = () => {
        setComponentToShow("login");
     }; 
 
-    const onCreateQuiz = (nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante) => {
-        console.log(nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante);
+    const onCrearExamen = (nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante, questions) => {
+        console.log(nombreExamen, descripcionExamen, cantidadTotalPreguntas, tiempoExamen, group, tema, cantidadPreguntasEstudiante, questions);
     };
 
     return (
@@ -38,7 +38,7 @@ const AppContent = () => {
         {componentToShow === "register" && <RegisterUsers onRegister={onRegister}/>}
         {componentToShow === "messages" && <AuthContent />}
         {componentToShow === "createQuiz" && <CreateQuiz onCreateQuiz={onCreateQuiz}/>}
-        {componentToShow === "createQuestionQuiz" && <CreateQuestionsQuiz/>}
+        {componentToShow === "createQuestionsQuiz" && <CreateQuestionsQuiz onCrearExamen = {onCrearExamen}/>}
 
 
       </>

@@ -5,17 +5,17 @@ import MultipleAnswer from "./TypeQuestion/MultipleAnswer";
 import FalseTrueAnswer from "./TypeQuestion/FalseTrueAnswer";
 import MatchConcepts from "./TypeQuestion/MatchConcepts";
 
-const Question = ({ questionId, onQuestionChange }) => {
+const Question = ({ questionId, onQuestionChange, initialData }) => {
   const { register, watch, handleSubmit, formState: { errors } } = useForm();
   const [question, setQuestion] = useState({
-    pregunta: '',
-    tipo_pregunta: 'Respuesta Unica',
-    opciones: [],
-    privacidad: false,
-    valorPorcentaje: 0
+    pregunta: initialData.pregunta || '',
+    tipo_pregunta: initialData.tipo_pregunta || 'Respuesta Unica',
+    opciones: initialData.opciones || [],
+    privacidad: initialData.privacidad || false,
+    valorPorcentaje: initialData.valorPorcentaje || undefined
   });
 
-  const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState(initialData.opciones || []);
   const prevQuestionRef = useRef(question);
 
   const handleOptionsChange = (updatedOptions) => {
@@ -25,13 +25,33 @@ const Question = ({ questionId, onQuestionChange }) => {
   const tiposPregunta = [
     "Respuesta Unica",
     "Respuesta Multiple",
-    "Falso - verdadero",
+    "Falso - Verdadero",
     "Emparejar Conceptos",
   ];
 
   const [showComponentQuestion, setshowComponentQuestion] = useState(
-    <UniqueAnswer onOptionsChange={handleOptionsChange} />
+    <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange}  initialOptions={initialData.opciones}/>
   );
+
+  useEffect(() => {
+    if (initialData.tipo_pregunta === "Respuesta Unica") {
+      setshowComponentQuestion(
+        <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange} />
+      );
+    } else if (initialData.tipo_pregunta === "Respuesta Multiple") {
+      setshowComponentQuestion(
+        <MultipleAnswer onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones}/>
+      );
+    } else if (initialData.tipo_pregunta === "Falso - Verdadero") {
+      setshowComponentQuestion(
+        <FalseTrueAnswer onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones}/>
+      );
+    } else if (initialData.tipo_pregunta === "Emparejar Conceptos") {
+      setshowComponentQuestion(
+        <MatchConcepts onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones}/>
+      );
+    }
+  }, []);
 
   const handleTipoPregunta = (e) => {
     const selectedTipoPregunta = e.target.value;
@@ -39,13 +59,13 @@ const Question = ({ questionId, onQuestionChange }) => {
     setQuestion((prev) => ({ ...prev, opciones: []}));
     if (selectedTipoPregunta === "Respuesta Unica") {
       setshowComponentQuestion(
-        <UniqueAnswer onOptionsChange={handleOptionsChange} />
+        <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange} />
       );
     } else if (selectedTipoPregunta === "Respuesta Multiple") {
       setshowComponentQuestion(
         <MultipleAnswer onOptionsChange={handleOptionsChange} />
       );
-    } else if (selectedTipoPregunta === "Falso - verdadero") {
+    } else if (selectedTipoPregunta === "Falso -Verdadero") {
       setshowComponentQuestion(
         <FalseTrueAnswer onOptionsChange={handleOptionsChange} />
       );
@@ -83,10 +103,6 @@ const Question = ({ questionId, onQuestionChange }) => {
     prevQuestionRef.current = question;
   }, [question, questionId, onQuestionChange]);
 
-  const prueba = () => {
-    console.log(question);
-  };
-
   return (
     <div className="bg-gray-100 border-2 border-gray-150 p-6 rounded-lg shadow-md max-w-3xl mx-auto mb-5">
       <div className="flex items-center mb-4">
@@ -94,9 +110,10 @@ const Question = ({ questionId, onQuestionChange }) => {
           id="tipoPregunta"
           name="tipoPregunta"
           className="bg-white border-2 border-gray-300 w-full text-sm px-4 py-3.5 rounded-lg outline-blue-500"
-          {...register("tipoPregunta", {
+          {...register("tipo_pregunta", {
             required: "El tipo de la pregunta es requerido",
           })}
+          value={question.tipo_pregunta}
           onChange={handleTipoPregunta}
         >
           {tiposPregunta.map((opcion, index) => (
@@ -113,10 +130,10 @@ const Question = ({ questionId, onQuestionChange }) => {
           name="valorPorcentaje"
           placeholder="Indica el valor en porcentaje que tendra la pregunta"
           className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg"
-          
           {...register("valorPorcentaje", {
             required: "El valor de la pregunta es requerido",
           })}
+          value={question.valorPorcentaje}
           onChange={handlePorcentajePregunta}
         />
       </div>
@@ -130,6 +147,7 @@ const Question = ({ questionId, onQuestionChange }) => {
           {...register("pregunta", {
             required: "El texto de la pregunta es requerido",
           })}
+          value={question.pregunta}
           onChange={handlePreguntaChange}
         />
       </div>
@@ -144,18 +162,12 @@ const Question = ({ questionId, onQuestionChange }) => {
             name="privacidad"
             type="checkbox"
             className="sr-only peer"
+            checked={question.privacidad}
             onChange={handlePrivacidadChange}
           />
           <div className="w-11 h-6 flex items-center bg-gray-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:left-[2px] peer-checked:after:border-white after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#007bff]"></div>
         </label>
       </div>
-      <button
-        onClick={prueba}
-        className="text-red-500 hover:underline"
-        type="button"
-      >
-        Si
-      </button>
     </div>
   );
 };

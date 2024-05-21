@@ -39,7 +39,7 @@ const CreateQuiz = ({ onCreateQuiz }) => {
                     className="w-52 inline-block"
                   />
                 </a>
-                <h1 className="text-base font-semibold mt-5">CREAR EXAMEN</h1>
+                <h1 className="text-base font-semibold mt-5">EXAMEN</h1>
               </div>
               <form onSubmit={handleSubmit(onSubmitCrearExamen)}>
                 <div className="mb-3 mt-2">
@@ -214,7 +214,7 @@ const CreateQuiz = ({ onCreateQuiz }) => {
                     type="submit"
                     className=" btn btn-primary h-50% w-full active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01]  ease-in-out transform py-4 bg-blue-500 rounded-xl text-white font-bold text-lg"
                   >
-                    Crear Examen
+                    Añadir Preguntas Examen
                   </button>
                 </div>
               </form>

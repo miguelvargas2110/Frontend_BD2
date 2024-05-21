@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const FalseTrueAnswer = ({ onOptionsChange }) => {
-  const [options, setOptions] = useState([
+const FalseTrueAnswer = ({ onOptionsChange, initialOptions }) => {
+  const defaultOptions = [
     { id: 1, text: "Falso", correct: false },
     { id: 2, text: "Verdadero", correct: false },
-  ]);
-  const [correctOption, setCorrectOption] = useState(null);
+  ];
+
+  const [options, setOptions] = useState(initialOptions || defaultOptions);
+  const [correctOption, setCorrectOption] = useState(
+    initialOptions ? initialOptions.find(option => option.correct)?.id : null
+  );
 
   const handleOptionTextChange = (id, newText) => {
     const updatedOptions = options.map((option) =>
@@ -26,6 +30,14 @@ const FalseTrueAnswer = ({ onOptionsChange }) => {
     onOptionsChange(updatedOptions);
   };
 
+  useEffect(() => {
+    if (initialOptions) {
+      setOptions(initialOptions);
+      const initialCorrect = initialOptions.find(option => option.correct)?.id;
+      setCorrectOption(initialCorrect);
+    }
+  }, [initialOptions]);
+
   return (
     <div>
       {options.map((option) => (
@@ -37,12 +49,11 @@ const FalseTrueAnswer = ({ onOptionsChange }) => {
               className="w-5 h-5 mr-2"
               checked={correctOption === option.id}
               onChange={() => handleCorrectOptionChange(option.id)}
-              
             />
             <input
               type="text"
               placeholder={option.text}
-              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 text-gray-500"
+              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 "
               value={option.text}
               readOnly
               onChange={(e) =>
@@ -55,4 +66,5 @@ const FalseTrueAnswer = ({ onOptionsChange }) => {
     </div>
   );
 };
+
 export default FalseTrueAnswer;

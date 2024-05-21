@@ -1,20 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const UniqueAnswer = ({ onOptionsChange }) => {
-  const [options, setOptions] = useState([
+const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions }) => {
+
+  const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: false },
     { id: 2, text: "", correct: false },
   ]);
-  const [correctOption, setCorrectOption] = useState(null);
+  const [correctOption, setCorrectOption] = useState(
+    initialOptions ? initialOptions.find(option => option.correct)?.id : null
+  );
 
   const addOption = () => {
     const newOption = {
       id: options.length + 1,
-      text: "Opcion " + Number(options.length + 1),
+      text: "Opción " + Number(options.length + 1),
       correct: false,
     };
-    setOptions([...options, newOption]);
-    onOptionsChange([...options, newOption]);
+    const updatedOptions = [...options, newOption];
+    setOptions(updatedOptions);
+    onOptionsChange(updatedOptions);
   };
 
   const deleteLastOption = () => {
@@ -44,28 +48,34 @@ const UniqueAnswer = ({ onOptionsChange }) => {
     setCorrectOption(id);
   };
 
+  useEffect(() => {
+    if (initialOptions) {
+      setOptions(initialOptions);
+      const initialCorrect = initialOptions.find(option => option.correct)?.id;
+      setCorrectOption(initialCorrect);
+    }
+  }, [initialOptions]);
+
   return (
     <div>
       {options.map((option) => (
         <div className="mb-6 flex items-center" key={option.id}>
           <label className="flex items-center w-full">
             <input
+              id={`radioOption-${questionId}-${option.id}`}
               type="radio"
-              name="correctOption"
+              name={`correctOption-${questionId}`}
               className="w-5 h-5 mr-2"
               checked={correctOption === option.id}
               onChange={() => handleCorrectOptionChange(option.id)}
-              
             />
             <input
               type="text"
               id="textOption"
-              placeholder={"Opcion"}
-              
-              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 text-gray-500 rounded-lg"
-              onChange={(e) =>
-                handleOptionTextChange(option.id, e.target.value)
-              }
+              placeholder="Opción"
+              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg"
+              value={option.text}
+              onChange={(e) => handleOptionTextChange(option.id, e.target.value)}
             />
           </label>
         </div>

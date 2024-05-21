@@ -2,24 +2,42 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Question from "./Question";
 import Swal from "sweetalert2";
-import QuestionTeacherModal from "./QuestionsTeacherModal";
+import QuestionsTeacherModal from "./QuestionsTeacherModal";
+import QuestionsPublicModal from "./QuestionsPublicModal";
 
-const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
+const CreateQuestionsQuiz = ({ onCrearExamen }) => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm();
   const [questions, setQuestions] = useState([{ id: 1, questionData: {} }]);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState("");
+
+  const cantidadTotalPreguntas = watch("cantidadTotalPreguntas");
 
   const handleAddQuestion = () => {
-    const newId = questions.length + 1;
-    setQuestions([...questions, { id: newId, questionData: {} }]);
+    if (Number(cantidadTotalPreguntas) > questions.length) {
+      const newId = questions.length + 1;
+      setQuestions([...questions, { id: newId, questionData: {} }]);
+    } else {
+      Swal.fire({
+        icon: "error",
+        text: `No se pueden agregar más preguntas`,
+      });
+    }
   };
+  
 
   const handleRemoveQuestion = () => {
     if (questions.length > 1) {
       setQuestions(questions.slice(0, -1));
+      Swal.fire({
+        icon: "success",
+        text: `La pregunta fue eliminada  `,
+      });
     }
   };
 
@@ -32,9 +50,11 @@ const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
   };
 
   const validateQuestions = () => {
+    console.log(questions);
     let totalPorcentaje = 0;
     for (const q of questions) {
-      const { pregunta, valorPorcentaje, tipo_pregunta, opciones } = q.questionData;
+      const { pregunta, valorPorcentaje, tipo_pregunta, opciones } =
+        q.questionData;
       totalPorcentaje += Number(valorPorcentaje);
 
       if (!pregunta || pregunta.trim() === "") {
@@ -65,8 +85,16 @@ const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
         }
       }
 
-      if (["Respuesta Unica", "Respuesta Multiple", "Falso - verdadero"].includes(tipo_pregunta)) {
-        if (!opciones || opciones.length === 0 || !opciones.some((option) => option.correct)) {
+      if (
+        ["Respuesta Unica", "Respuesta Multiple", "Falso - Verdadero"].includes(
+          tipo_pregunta
+        )
+      ) {
+        if (
+          !opciones ||
+          opciones.length === 0 ||
+          !opciones.some((option) => option.correct)
+        ) {
           Swal.fire({
             icon: "error",
             text: `La pregunta ${q.id} debe tener al menos una opción correcta.`,
@@ -76,7 +104,11 @@ const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
       }
 
       if (tipo_pregunta === "Emparejar Conceptos") {
-        if (!opciones || opciones.length === 0 || !opciones.every((option) => option.correct)) {
+        if (
+          !opciones ||
+          opciones.length === 0 ||
+          !opciones.every((option) => option.correct)
+        ) {
           Swal.fire({
             icon: "error",
             text: `La pregunta ${q.id} debe tener opciones emparejadas.`,
@@ -95,17 +127,9 @@ const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
     return true;
   };
 
-  const handleSelectQuestion = (question) => {
-    setSelectedQuestion(question);
-  };
-
-  const handleClearSelectedQuestion = () => {
-    setSelectedQuestion(null);
-  };
-
   const onSubmitCrearExamen = (data) => {
     if (validateQuestions()) {
-      onCrearQuestions(
+      onCrearExamen(
         data.nombreExamen,
         data.descripcionExamen,
         data.cantidadTotalPreguntas,
@@ -116,6 +140,37 @@ const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
         questions.map((q) => q.questionData)
       );
     }
+  };
+
+  const handleSelectQuestion = (question) => {
+    if (Number(cantidadTotalPreguntas) > questions.length) {
+    const newId = questions.length + 1;
+    const { id, ...questionDataWithoutId } = question;
+    const newQuestion = { id: newId, questionData: questionDataWithoutId };
+    setQuestions([...questions, newQuestion]);
+    setShowModal(false);
+    }
+    else{
+      setShowModal(false);
+      Swal.fire({
+        icon: "error",
+        text: `No se pueden agregar más preguntas`,
+      });
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const openTeacherModal = () => {
+    setModalType("teacher");
+    setShowModal(true);
+  };
+
+  const openPublicModal = () => {
+    setModalType("public");
+    setShowModal(true);
   };
 
   return (
@@ -136,19 +191,188 @@ const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
                   />
                 </a>
                 <h1 className="text-base font-semibold mt-5">
-                  CREAR PREGUNTAS EXAMEN
+                  EXAMEN
                 </h1>
               </div>
               <form onSubmit={handleSubmit(onSubmitCrearExamen)}>
-                {/* <QuestionTeacherModal
-                  onSelectQuestion={(question) => console.log("Question selected:", question)}
-                  closeModal={() => console.log("Closing modal")}
-                /> */}
+                <div className="mb-3 mt-2">
+                  <label htmlFor="nombreExamen" className="text-lg font-medium">
+                    Nombre del Examen
+                  </label>
+                  <input
+                    id="nombreExamen"
+                    name="nombreExamen"
+                    placeholder="Ingresa el nombre del examen"
+                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
+                    {...register("nombreExamen", {
+                      required: "El nombre del examen es requerido",
+                    })}
+                  ></input>
+                  {errors.nombreExamen && (
+                    <p className="text-red-500">
+                      {errors.nombreExamen.message}
+                    </p>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <label className="text-lg font-medium">
+                    Descripcion del examen
+                  </label>
+                  <textarea
+                    id="descripcionExamen"
+                    name="descripcionExamen"
+                    placeholder="Ingresa la Descripcion del examen"
+                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
+                    {...register("descripcionExamen", {
+                      required: "La descripcion es requerida",
+                    })}
+                  ></textarea>
+                  {errors.descripcionExamen && (
+                    <p className="text-red-500">
+                      {errors.descripcionExamen.message}
+                    </p>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <label className="text-lg font-medium">
+                    Cantidad total de preguntas
+                  </label>
+                  <input
+                    type="number"
+                    id="cantidadTotalPreguntas"
+                    name="cantidadTotalPreguntas"
+                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
+                    placeholder="Ingresa la cantidad Total de Preguntas"
+                    {...register("cantidadTotalPreguntas", {
+                      required: "Por favor ingrese la cantidad de preguntas.",
+                      pattern: {
+                        value: /^[0-9]*$/,
+                        message:
+                          "La cantidad de preguntas debe darse solo en números positivos.",
+                      },
+                    })}
+                  />
+                  {errors.cantidadTotalPreguntas && (
+                    <p className="text-red-500">
+                      {errors.cantidadTotalPreguntas.message}
+                    </p>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <label className="text-lg font-medium">
+                    Tiempo para responder el examen
+                  </label>
+                  <input
+                    type="text"
+                    id="tiempoExamen"
+                    name="tiempoExamen"
+                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
+                    placeholder="Ingresa el tiempo en minutos para responder el examen"
+                    {...register("tiempoExamen", {
+                      required: "Por favor ingrese el tiempo.",
+                      pattern: {
+                        value: /^[0-9]*$/,
+                        message:
+                          "La tiempo debe darse solo en números positivos.",
+                      },
+                    })}
+                  />
+                  {errors.tiempoExamen && (
+                    <p className="text-red-500">
+                      {errors.tiempoExamen.message}
+                    </p>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <label className="text-lg font-medium">
+                    Grupo del Estudiante
+                  </label>
+                  <select
+                    id="group"
+                    name="group"
+                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
+                    {...register("group", {
+                      required: "El grupo es requerido",
+                    })}
+                  >
+                    <option value="Grupo 1">Grupo 1</option>
+                    <option value="Grupo 2">Grupo 2</option>
+                    <option value="Grupo 3">Grupo 3</option>
+                    <option value="Grupo 4">Grupo 4</option>
+                  </select>
+                  {errors.group && (
+                    <p className="text-red-500">{errors.group.message}</p>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <label className="text-lg font-medium">Tema del Examen</label>
+                  <select
+                    id="tema"
+                    name="tema"
+                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
+                    {...register("tema", {
+                      required: "El tema es requerido",
+                    })}
+                  >
+                    <option value="Triggers">Triggers</option>
+                    <option value="Cursores">Cursores</option>
+                    <option value="Funciones">Funciones</option>
+                    <option value="Procedimiento">Procedimiento</option>
+                  </select>
+                  {errors.tema && (
+                    <p className="text-red-500">{errors.tema.message}</p>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <label className="text-lg font-medium">
+                    Cantidad de preguntas por Estudiante
+                  </label>
+                  <input
+                    type="number"
+                    id="cantidadPreguntasEstudiante"
+                    name="cantidadPreguntasEstudiante"
+                    className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
+                    placeholder="Ingresa la cantidad preguntas por Estudiante"
+                    {...register("cantidadPreguntasEstudiante", {
+                      required: "Por favor ingrese la cantidad de preguntas.",
+                      validate: (value) => {
+                        const numericValue = Number(value);
+                        if (isNaN(numericValue)) {
+                          return "Por favor ingrese un número válido.";
+                        }
+                        if (numericValue > cantidadTotalPreguntas) {
+                          return "La cantidad de preguntas por estudiante no puede ser mayor a la cantidad total de preguntas.";
+                        }
+                        if (numericValue <= 0) {
+                          return "La cantidad de preguntas por estudiante no puede ser menor a 1.";
+                        }
+                        return true;
+                      },
+
+                      pattern: {
+                        value: /^[0-9]*$/,
+                        message:
+                          "La cantidad de preguntas debe darse solo en números positivos.",
+                      },
+                    })}
+                  />
+                  {errors.cantidadPreguntasEstudiante && (
+                    <p className="text-red-500">
+                      {errors.cantidadPreguntasEstudiante.message}
+                    </p>
+                  )}
+                </div>
+                <div className="!mt-5 mb-5 text-center">
+                  <h1 className="text-base font-semibold mt-5">
+                    Preguntas del examen
+                  </h1>
+                </div>
                 {questions.map((q) => (
                   <Question
                     key={q.id}
                     questionId={q.id}
                     onQuestionChange={handleQuestionChange}
+                    initialData={q.questionData}
                   />
                 ))}
                 <div className="flex justify-between mt-4">
@@ -157,7 +381,21 @@ const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
                     onClick={handleAddQuestion}
                     className="text-blue-500 hover:underline"
                   >
-                    Agregar Pregunta
+                    Agregar Pregunta Nueva
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openPublicModal}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Agregar Pregunta de Banco Público
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openTeacherModal}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Agregar Pregunta de Banco Privado
                   </button>
                   <button
                     type="button"
@@ -176,6 +414,18 @@ const CreateQuestionsQuiz = ({ onCrearQuestions }) => {
                   </button>
                 </div>
               </form>
+              {showModal && modalType === "teacher" && (
+                <QuestionsTeacherModal
+                  onSelectQuestion={handleSelectQuestion}
+                  closeModal={closeModal}
+                />
+              )}
+              {showModal && modalType === "public" && (
+                <QuestionsPublicModal
+                  onSelectQuestion={handleSelectQuestion}
+                  closeModal={closeModal}
+                />
+              )}
             </div>
           </div>
         </div>

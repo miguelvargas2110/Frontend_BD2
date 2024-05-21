@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const MultipleAnswer = ({ onOptionsChange }) => {
-  const [options, setOptions] = useState([
+const MultipleAnswer = ({ onOptionsChange, initialOptions }) => {
+  const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: false },
     { id: 2, text: "", correct: false },
   ]);
@@ -12,8 +12,9 @@ const MultipleAnswer = ({ onOptionsChange }) => {
       text: "",
       correct: false,
     };
-    setOptions([...options, newOption]);
-    onOptionsChange([...options, newOption]);
+    const updatedOptions = [...options, newOption];
+    setOptions(updatedOptions);
+    onOptionsChange(updatedOptions);
   };
 
   const deleteLastOption = () => {
@@ -40,6 +41,12 @@ const MultipleAnswer = ({ onOptionsChange }) => {
     onOptionsChange(updatedOptions);
   };
 
+  useEffect(() => {
+    if (initialOptions) {
+      setOptions(initialOptions);
+    }
+  }, [initialOptions]);
+
   return (
     <div>
       {options.map((option) => (
@@ -55,11 +62,9 @@ const MultipleAnswer = ({ onOptionsChange }) => {
             <input
               type="text"
               placeholder={"Opcion"}
-              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 text-gray-500 rounded-lg"
-              
-              onChange={(e) =>
-                handleOptionTextChange(option.id, e.target.value)
-              }
+              className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg"
+              value={option.text}
+              onChange={(e) => handleOptionTextChange(option.id, e.target.value)}
             />
           </label>
         </div>
