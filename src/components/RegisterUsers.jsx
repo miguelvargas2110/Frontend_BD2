@@ -94,7 +94,7 @@ const RegisterUsers = ({ onRegister }) => {
                             <div className="text-center mb-10">
                                 <a href="#">
                                     <img
-                                        src="https://res.cloudinary.com/dgp8hrrbj/image/upload/v1713754905/o72hn6qxk8r66wmgy1vd.png"
+                                        src="https://res.cloudinary.com/dgp8hrrbj/image/upload/v1715982390/esbmqo746arulx4wywer.png"
                                         alt="logo"
                                         className="w-52 inline-block"
                                     />
