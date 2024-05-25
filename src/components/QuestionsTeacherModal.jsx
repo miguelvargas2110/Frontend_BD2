@@ -1,55 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import bancoService from "../services/bancoService";
 
-const QuestionsTeacherModal = ({ onSelectQuestion, closeModal }) => {
+const QuestionsTeacherModal = ({ onSelectQuestion, closeModal, idTema }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [formData, setFormData] = useState({
+    idTema: idTema,
+    idProfesor: localStorage.getItem("id")
+  });
+
   const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      pregunta: "¿Cuál es la capital de Francia?",
-      tipo_pregunta: "Respuesta Unica",
-      opciones: [
-        { id: 1, text: "Paris", correct: true },
-        { id: 2, text: "Monaco", correct: false },
-      ],
-      privacidad: true,
-      valorPorcentaje: 10,
-    },
-    {
-      id: 2,
-      pregunta: "¿Cuánto es 2 + 2?",
-      tipo_pregunta: "Respuesta Multiple",
-      opciones: [
-        { id: 1, text: "3", correct: false },
-        { id: 2, text: "5", correct: false },
-        { id: 3, text: "4", correct: true },
-      ],
-      privacidad: true,
-      valorPorcentaje: 10,
-    },
-    {
-      id: 3,
-      pregunta: "¿Cuánto es 2 + 2?",
-      tipo_pregunta: "Falso - Verdadero",
-      opciones: [
-        { id: 1, text: "Verdadero", correct: false },
-        { id: 2, text: "Falso", correct: true },
-      ],
-      privacidad: true,
-      valorPorcentaje: 10,
-    },
-    {
-      id: 4,
-      pregunta: "¿Cuánto es 2 + 2?",
-      tipo_pregunta: "Emparejar Conceptos",
-      opciones: [
-        { id: 1, text: "2", correct: "sapo" },
-        { id: 2, text: "3", correct: "sapo x2" },
-      ],
-      privacidad: true,
-      valorPorcentaje: 10,
-    },
+    
   ]);
+
+  useEffect(() => {
+    console.log(formData)
+    const fetchQuestions = async () => {
+      try{
+        const response = await bancoService.bancoPrivado(formData);
+        if(response.success){
+          console.log(response.message);
+          setQuestions(response.message);
+        }
+      }catch (error) {
+        console.error('Error al obtener preguntas:', error.message);
+      }
+    };
+    fetchQuestions();
+  }, []);
 
   const handleSelectQuestion = (question) => {
     onSelectQuestion(question);

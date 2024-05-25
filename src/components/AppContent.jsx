@@ -7,7 +7,7 @@ import RegisterUsers from './RegisterUsers.jsx';
 import CreateQuestionsQuiz from './CreateQuestionQuiz.jsx';
 
 const AppContent = () => {
-    const [componentToShow, setComponentToShow] = useState("login");
+    const [componentToShow, setComponentToShow] = useState("welcome");
 
     const navigateTo = (componentName) => {
         setComponentToShow(componentName);

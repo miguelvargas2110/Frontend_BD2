@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const MatchConcepts = ({ onOptionsChange, initialOptions }) => {
+const MatchConcepts = ({ onOptionsChange, initialOptions, isBanco }) => {
   const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: "" },
     { id: 2, text: "", correct: "" },
@@ -56,6 +56,7 @@ const MatchConcepts = ({ onOptionsChange, initialOptions }) => {
               onChange={(e) =>
                 handleConceptChange(pair.id, e.target.value, pair.correct)
               }
+              disabled={isBanco}
             />
             <span className="mx-2">→</span>
             <input
@@ -67,6 +68,7 @@ const MatchConcepts = ({ onOptionsChange, initialOptions }) => {
               onChange={(e) =>
                 handleConceptChange(pair.id, pair.text, e.target.value)
               }
+              disabled={isBanco}
             />
           </label>
         </div>
@@ -76,6 +78,7 @@ const MatchConcepts = ({ onOptionsChange, initialOptions }) => {
           onClick={addPair}
           className="text-indigo-500 hover:underline"
           type="button"
+          disabled={isBanco}
         >
           Agregar otra pareja
         </button>
@@ -83,6 +86,7 @@ const MatchConcepts = ({ onOptionsChange, initialOptions }) => {
           onClick={deleteLastPair}
           className="text-red-500 hover:underline"
           type="button"
+          disabled={isBanco}
         >
           Eliminar última pareja
         </button>

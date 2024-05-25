@@ -17,6 +17,42 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
     formState: { errors },
   } = useForm();
 
+  const [grupos, setGrupos] = useState([]); // Inicializa grupos como un array vacío
+  const [temas, setTemas] = useState([]); // Nuevo estado para los temas
+  const [tipoPreguntas, setTipoPreguntas] = useState([]); // Nuevo estado para los tipos de preguntas
+  
+ useEffect(() => {
+    const fetchGrupos = async () => {
+      const response = await grupoServices.obtenerGruposProfesor(localStorage.getItem('id'));
+      if (response.success) {
+        setGrupos(response.message);
+        fetchTemas(response.message[0][0]); // Llamar a fetchTemas con el primer grupo
+      } else {
+        console.error('Error al obtener grupos:', response.message);
+      }
+    };
+    fetchGrupos();
+    const fetchTipoPregunta = async () => {
+      const response = await tipoPregunta.obtenertipoPregunta();
+      if (response.success) {
+        setTipoPreguntas(response.message);
+      } else {
+        console.error('Error al obtener tipo de preguntas:', response.message);
+      }
+    };
+    fetchTipoPregunta();
+  }, []);
+
+  const fetchTemas = async (idGrupo) => {
+    const response = await temasService.obtenerTemas(idGrupo);
+    if (response.success) {
+      formDataExamen.idTema = response.message[0][0]; // Asigna el primer tema al estado
+      setTemas(response.message); // Asigna los temas al estado
+    } else {
+      console.error('Error al obtener temas:', response.message);
+    }
+  };
+
   const [formDataExamen, setFormDataExamen] = useState({
     nombre: '',
     descripcion: '',
@@ -49,46 +85,17 @@ const CreateQuestionsQuiz = ({ onCrearExamen }) => {
     porcentajePregunta: 0
   });
 
-  const [grupos, setGrupos] = useState([]); // Inicializa grupos como un array vacío
-  const [temas, setTemas] = useState([]); // Nuevo estado para los temas
-  const [tipoPreguntas, setTipoPreguntas] = useState([]); // Nuevo estado para los tipos de preguntas
-
-  useEffect(() => {
-    const fetchGrupos = async () => {
-      const response = await grupoServices.obtenerGruposProfesor(localStorage.getItem('id'));
-      if (response.success) {
-        setGrupos(response.message);
-        fetchTemas(response.message[0][0]); // Llamar a fetchTemas con el primer grupo
-      } else {
-        console.error('Error al obtener grupos:', response.message);
-      }
-    };
-    fetchGrupos();
-    const fetchTipoPregunta = async () => {
-      const response = await tipoPregunta.obtenertipoPregunta();
-      if (response.success) {
-        setTipoPreguntas(response.message);
-      } else {
-        console.error('Error al obtener tipo de preguntas:', response.message);
-      }
-    };
-    fetchTipoPregunta();
-  }, []);
-
-  const fetchTemas = async (idGrupo) => {
-    const response = await temasService.obtenerTemas(idGrupo);
-    if (response.success) {
-      setTemas(response.message); // Asigna los temas al estado
-    } else {
-      console.error('Error al obtener temas:', response.message);
-    }
-  };
-
   const handleGroupChange = (event) => {
     const selectedGroup = event.target.value;
     fetchTemas(selectedGroup); // Llamar a fetchTemas con el grupo seleccionado
   };
 
+  const handleTemaChange = (event) => {
+    const selectTema = event.target.value;
+    console.log(selectTema);
+    formDataExamen.idTema = selectTema;
+  }
+  
   const [questions, setQuestions] = useState([{ id: 1, questionData: {} }]);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -456,6 +463,7 @@ return (
                   {...register("tema", {
                     required: "El tema es requerido",
                   })}
+                  onChange={handleTemaChange}
                 >
                   {temas.map((tema) => (
                     <option key={tema[0]} value={tema[0]}>
@@ -566,12 +574,14 @@ return (
               <QuestionsTeacherModal
                 onSelectQuestion={handleSelectQuestion}
                 closeModal={closeModal}
+                idTema = {formDataExamen.idTema}
               />
             )}
             {showModal && modalType === "public" && (
               <QuestionsPublicModal
                 onSelectQuestion={handleSelectQuestion}
                 closeModal={closeModal}
+                idTema = {formDataExamen.idTema}
               />
             )}
           </div>

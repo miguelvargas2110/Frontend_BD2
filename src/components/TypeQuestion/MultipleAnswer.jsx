@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const MultipleAnswer = ({ onOptionsChange, initialOptions }) => {
+const MultipleAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
   const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: false },
     { id: 2, text: "", correct: false },
@@ -58,6 +58,7 @@ const MultipleAnswer = ({ onOptionsChange, initialOptions }) => {
               className="w-5 h-5 mr-2"
               checked={option.correct}
               onChange={() => handleCorrectOptionChange(option.id)}
+              disabled={isBanco}
             />
             <input
               type="text"
@@ -65,6 +66,7 @@ const MultipleAnswer = ({ onOptionsChange, initialOptions }) => {
               className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg"
               value={option.text}
               onChange={(e) => handleOptionTextChange(option.id, e.target.value)}
+              disabled={isBanco}
             />
           </label>
         </div>
@@ -74,6 +76,7 @@ const MultipleAnswer = ({ onOptionsChange, initialOptions }) => {
           onClick={addOption}
           className="text-indigo-500 hover:underline"
           type="button"
+          disabled={isBanco}
         >
           Agregar otra opción
         </button>
@@ -81,6 +84,7 @@ const MultipleAnswer = ({ onOptionsChange, initialOptions }) => {
           onClick={deleteLastOption}
           className="text-red-500 hover:underline"
           type="button"
+          disabled={isBanco}
         >
           Eliminar última opción
         </button>

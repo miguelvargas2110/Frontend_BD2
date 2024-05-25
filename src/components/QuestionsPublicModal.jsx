@@ -1,29 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import bancoService from "../services/bancoService";
 
-const QuestionsPublicModal = ({ onSelectQuestion, closeModal }) => {
+const QuestionsPublicModal = ({ onSelectQuestion, closeModal, idTema }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      pregunta: "¿Cuál es la capital de España?",
-      tipo_pregunta: "Respuesta Multiple",
-      opciones: [
-        { id: 1, text: "Madrid", correct: true },
-        { id: 2, text: "Barcelona", correct: false },
-      ],
-      privacidad: false,
-      valorPorcentaje: 10,
-    },
-    {
-      id: 2,
-      pregunta: "¿Cuánto es 3 + 3?",
-      tipo_pregunta: "Respuesta Unica",
-      opciones: [],
-      privacidad: false,
-      valorPorcentaje: 10,
-    },
+    
   ]);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try{
+        const response = await bancoService.bancoPublico(idTema);
+        if(response.success){
+          console.log(response.message);
+          setQuestions(response.message);
+        }
+      }catch(error){
+        console.error('Error al obtener preguntas:', error);
+      }
+    };
+    fetchQuestions();
+  }, []);
 
   const handleSelectQuestion = (question) => {
     onSelectQuestion(question);

@@ -9,8 +9,9 @@ import tipoPregunta from "../services/tipoPreguntaService";
 const Question = ({ questionId, onQuestionChange, initialData }) => {
   const { register, watch, handleSubmit, formState: { errors } } = useForm();
   const [question, setQuestion] = useState({
+    isBanco: initialData.isBanco || false,
     pregunta: initialData.pregunta || '',
-    tipo_pregunta: initialData.tipo_pregunta || 'Respuesta Unica',
+    tipo_pregunta: initialData.tipo_pregunta || 1,
     opciones: initialData.opciones || [],
     privacidad: initialData.privacidad || false,
     valorPorcentaje: initialData.valorPorcentaje || undefined
@@ -39,21 +40,21 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
       }
     };
     fetchTipoPregunta();
-    if (initialData.tipo_pregunta === "Respuesta Unica") {
+    if (initialData.tipo_pregunta === 1) {
       setshowComponentQuestion(
-        <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange} />
+        <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange} isBanco={question.isBanco}/>
       );
-    } else if (initialData.tipo_pregunta === "Respuesta Multiple") {
+    } else if (initialData.tipo_pregunta === 2) {
       setshowComponentQuestion(
-        <MultipleAnswer onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones}/>
+        <MultipleAnswer onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={question.isBanco}/>
       );
-    } else if (initialData.tipo_pregunta === "Falso - Verdadero") {
+    } else if (initialData.tipo_pregunta === 3) {
       setshowComponentQuestion(
-        <FalseTrueAnswer onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones}/>
+        <FalseTrueAnswer onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={question.isBanco}/>
       );
-    } else if (initialData.tipo_pregunta === "Emparejar Conceptos") {
+    } else if (initialData.tipo_pregunta === 4) {
       setshowComponentQuestion(
-        <MatchConcepts onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones}/>
+        <MatchConcepts onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={question.isBanco}/>
       );
     }
   }, []);
@@ -80,7 +81,6 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
       );
     }
   };
-
   const handlePreguntaChange = (e) => {
     const { value } = e.target;
     setQuestion((prev) => ({ ...prev, pregunta: value }));
@@ -120,6 +120,7 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
           })}
           value={question.tipo_pregunta}
           onChange={handleTipoPregunta}
+          disabled={question.isBanco}
         >
           {tiposPregunta.map((tipo_pregunta) => (
             <option key={tipo_pregunta[0]} value={tipo_pregunta[0]}>
@@ -140,6 +141,7 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
           })}
           value={question.valorPorcentaje}
           onChange={handlePorcentajePregunta}
+          disabled={question.isBanco}
         />
       </div>
       <div className="mb-4">
@@ -154,6 +156,7 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
           })}
           value={question.pregunta}
           onChange={handlePreguntaChange}
+          disabled={question.isBanco}
         />
       </div>
       {showComponentQuestion}
@@ -169,6 +172,7 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
             className="sr-only peer"
             checked={question.privacidad}
             onChange={handlePrivacidadChange}
+            disabled={question.isBanco}
           />
           <div className="w-11 h-6 flex items-center bg-gray-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:left-[2px] peer-checked:after:border-white after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#007bff]"></div>
         </label>

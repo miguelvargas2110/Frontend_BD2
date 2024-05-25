@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const FalseTrueAnswer = ({ onOptionsChange, initialOptions }) => {
+const FalseTrueAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
   const defaultOptions = [
     { id: 1, text: "Falso", correct: false },
     { id: 2, text: "Verdadero", correct: false },
@@ -49,6 +49,7 @@ const FalseTrueAnswer = ({ onOptionsChange, initialOptions }) => {
               className="w-5 h-5 mr-2"
               checked={correctOption === option.id}
               onChange={() => handleCorrectOptionChange(option.id)}
+              disabled={isBanco}
             />
             <input
               type="text"
@@ -59,6 +60,7 @@ const FalseTrueAnswer = ({ onOptionsChange, initialOptions }) => {
               onChange={(e) =>
                 handleOptionTextChange(option.id, e.target.value)
               }
+              disabled={isBanco}
             />
           </label>
         </div>

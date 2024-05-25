@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions }) => {
+const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions, isBanco }) => {
 
   const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: false },
@@ -68,6 +68,7 @@ const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions }) => {
               className="w-5 h-5 mr-2"
               checked={correctOption === option.id}
               onChange={() => handleCorrectOptionChange(option.id)}
+              disabled={isBanco}
             />
             <input
               type="text"
@@ -76,6 +77,7 @@ const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions }) => {
               className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg"
               value={option.text}
               onChange={(e) => handleOptionTextChange(option.id, e.target.value)}
+              disabled={isBanco}
             />
           </label>
         </div>
@@ -85,6 +87,7 @@ const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions }) => {
           onClick={addOption}
           className="text-indigo-500 hover:underline"
           type="button"
+          disabled={isBanco}
         >
           Agregar otra opción
         </button>
@@ -92,6 +95,7 @@ const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions }) => {
           onClick={deleteLastOption}
           className="text-red-500 hover:underline"
           type="button"
+          disabled={isBanco}
         >
           Eliminar última opción
         </button>
