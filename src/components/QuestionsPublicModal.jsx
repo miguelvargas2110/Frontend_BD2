@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import bancoService from "../services/bancoService";
 
-const QuestionsPublicModal = ({ onSelectQuestion, closeModal, idTema }) => {
+const QuestionsPublicModal = ({ onSelectQuestion, closeModal, idTema, questions }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [questions, setQuestions] = useState([
+  const [questionsPublics, setQuestions] = useState([
     
   ]);
 
@@ -13,8 +13,10 @@ const QuestionsPublicModal = ({ onSelectQuestion, closeModal, idTema }) => {
       try{
         const response = await bancoService.bancoPublico(idTema);
         if(response.success){
-          console.log(response.message);
-          setQuestions(response.message);
+          const filteredQuestions = response.message.filter(
+            (question) => !questions.some((q) => q.questionData.id === question.id)
+          );
+          setQuestions(filteredQuestions);
         }
       }catch(error){
         console.error('Error al obtener preguntas:', error);
@@ -45,7 +47,7 @@ const QuestionsPublicModal = ({ onSelectQuestion, closeModal, idTema }) => {
               </tr>
             </thead>
             <tbody>
-              {questions.map((question) => (
+              {questionsPublics.map((question) => (
                 <tr
                   key={question.id}
                   className="hover:bg-gray-100 cursor-pointer"

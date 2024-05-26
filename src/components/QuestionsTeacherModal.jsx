@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import bancoService from "../services/bancoService";
 
-const QuestionsTeacherModal = ({ onSelectQuestion, closeModal, idTema }) => {
+const QuestionsTeacherModal = ({ onSelectQuestion, closeModal, idTema, questions }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [formData, setFormData] = useState({
@@ -9,18 +9,19 @@ const QuestionsTeacherModal = ({ onSelectQuestion, closeModal, idTema }) => {
     idProfesor: localStorage.getItem("id")
   });
 
-  const [questions, setQuestions] = useState([
+  const [questionsTeacher, setQuestions] = useState([
     
   ]);
 
   useEffect(() => {
-    console.log(formData)
     const fetchQuestions = async () => {
       try{
         const response = await bancoService.bancoPrivado(formData);
         if(response.success){
-          console.log(response.message);
-          setQuestions(response.message);
+          const filteredQuestions = response.message.filter(
+            (question) => !questions.some((q) => q.questionData.id === question.id)
+          );
+          setQuestions(filteredQuestions);
         }
       }catch (error) {
         console.error('Error al obtener preguntas:', error.message);
@@ -51,7 +52,7 @@ const QuestionsTeacherModal = ({ onSelectQuestion, closeModal, idTema }) => {
               </tr>
             </thead>
             <tbody>
-              {questions.map((question) => (
+              {questionsTeacher.map((question) => (
                 <tr
                   key={question.id}
                   className="hover:bg-gray-100 cursor-pointer"

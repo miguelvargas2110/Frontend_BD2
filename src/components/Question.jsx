@@ -14,7 +14,8 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
     tipo_pregunta: initialData.tipo_pregunta || 1,
     opciones: initialData.opciones || [],
     privacidad: initialData.privacidad || false,
-    valorPorcentaje: initialData.valorPorcentaje || undefined
+    valorPorcentaje: initialData.valorPorcentaje || undefined,
+    id: initialData.id || undefined,
   });
 
   const [options, setOptions] = useState(initialData.opciones || []);
@@ -141,7 +142,6 @@ const Question = ({ questionId, onQuestionChange, initialData }) => {
           })}
           value={question.valorPorcentaje}
           onChange={handlePorcentajePregunta}
-          disabled={question.isBanco}
         />
       </div>
       <div className="mb-4">

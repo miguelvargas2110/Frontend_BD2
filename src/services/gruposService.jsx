@@ -28,7 +28,6 @@ const grupoServices = {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log(response);
             if (response.status === 200) {
                 return { success: true, message: response.data.respuesta }
             } else {
