@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import classNames from "classnames";
 import { useForm } from "react-hook-form";
 import Swal from 'sweetalert2';
 import registerUser from "../services/usuarioRegisterService";
 import grupoServices from "../services/gruposService";
 
-const RegisterUsers = ({ onRegister }) => {
+const RegisterUsers = ({ onRegister, navigateToLogin }) => {
     const {
         register,
         watch,
@@ -256,30 +255,40 @@ const RegisterUsers = ({ onRegister }) => {
                                         </label>
                                         <input
                                             type="password"
-                                            id="cpassword"
-                                            name="cpassword"
+                                            id="confirmPassword"
+                                            name="confirmPassword"
                                             className="bg-gray-100 w-full text-sm px-4 py-3.5 rounded-md outline-blue-500"
-                                            placeholder="Ingresa de nuevo tu contraseña"
-                                            {...register("cpassword", {
-                                                required: "Por favor ingresa tu contraseña nuevamente.",
+                                            placeholder="Confirma tu contraseña"
+                                            {...register("confirmPassword", {
+                                                required: "Por favor confirma tu contraseña.",
                                                 validate: (value) =>
                                                     value === password || "Las contraseñas no coinciden.",
                                             })}
                                         />
-                                        {errors.cpassword && (
-                                            <p className="text-red-500">{errors.cpassword.message}</p>
+                                        {errors.confirmPassword && (
+                                            <p className="text-red-500">
+                                                {errors.confirmPassword.message}
+                                            </p>
                                         )}
                                     </div>
                                 </div>
-                                <div className="!mt-10">
+                                <div className="mt-6">
                                     <button
                                         type="submit"
-                                        className="btn btn-primary h-50% w-full active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01] ease-in-out transform py-4 bg-blue-500 rounded-xl text-white font-bold text-lg"
+                                        className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                     >
-                                        Registrarse
+                                        Registrar
                                     </button>
                                 </div>
                             </form>
+                            <div className="mt-6">
+                                <button
+                                    onClick={navigateToLogin}
+                                    className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500"
+                                >
+                                    Volver a Iniciar Sesión
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

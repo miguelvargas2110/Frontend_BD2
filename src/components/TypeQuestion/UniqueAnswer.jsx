@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions, isBanco }) => {
+const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions, isBanco, isExam }) => {
 
   const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: false },
@@ -38,23 +38,33 @@ const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions, isBanco }) 
   };
 
   const handleCorrectOptionChange = (id) => {
-    const updatedOptions = options.map((option) =>
-      option.id === id
-        ? { ...option, correct: true }
-        : { ...option, correct: false }
-    );
-    setOptions(updatedOptions);
-    onOptionsChange(updatedOptions);
-    setCorrectOption(id);
+      const updatedOptions = options.map((option) =>
+        option.id === id
+          ? { ...option, correct: true }
+          : { ...option, correct: false }
+      );
+      setOptions(updatedOptions);
+      onOptionsChange(updatedOptions);
+      setCorrectOption(id);
   };
 
   useEffect(() => {
     if (initialOptions) {
-      setOptions(initialOptions);
-      const initialCorrect = initialOptions.find(option => option.correct)?.id;
-      setCorrectOption(initialCorrect);
+
+        if (isExam) {
+            for (let i = 0; i < initialOptions.length; i++) {
+                if (initialOptions[i].correct) {
+                    initialOptions[i].correct = false;
+                }
+            }
+        }
+
+        setOptions(initialOptions);
+
+        const initialCorrect = initialOptions.find(option => option.correct)?.id;
+        setCorrectOption(initialCorrect);
     }
-  }, [initialOptions]);
+}, [initialOptions, isExam]);
 
   return (
     <div>
@@ -77,7 +87,7 @@ const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions, isBanco }) 
               className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg"
               value={option.text}
               onChange={(e) => handleOptionTextChange(option.id, e.target.value)}
-              disabled={isBanco}
+              disabled={isBanco || isExam}
             />
           </label>
         </div>
@@ -85,7 +95,7 @@ const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions, isBanco }) 
       <div className="flex justify-between mb-4">
         <button
           onClick={addOption}
-          className="text-indigo-500 hover:underline"
+          className={`text-indigo-500 hover:underline ${isExam ? 'hidden' : ''}`}
           type="button"
           disabled={isBanco}
         >
@@ -93,7 +103,7 @@ const UniqueAnswer = ({ questionId, onOptionsChange, initialOptions, isBanco }) 
         </button>
         <button
           onClick={deleteLastOption}
-          className="text-red-500 hover:underline"
+          className={`text-red-500 hover:underline ${isExam ? 'hidden' : ''}`}
           type="button"
           disabled={isBanco}
         >

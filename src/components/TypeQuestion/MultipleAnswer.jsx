@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const MultipleAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
+const MultipleAnswer = ({ onOptionsChange, initialOptions, isBanco, isExam }) => {
   const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: false },
     { id: 2, text: "", correct: false },
@@ -43,9 +43,19 @@ const MultipleAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
 
   useEffect(() => {
     if (initialOptions) {
-      setOptions(initialOptions);
+      if (isExam) {
+        // Crear una copia de initialOptions sin modificar la original
+        let modifiedOptions = initialOptions.map(option => {
+          return { ...option, correct: false };
+        });
+  
+        setOptions(modifiedOptions);
+      } else {
+        setOptions(initialOptions);
+      }
     }
-  }, [initialOptions]);
+  }, [initialOptions, isExam]);
+  
 
   return (
     <div>
@@ -66,7 +76,7 @@ const MultipleAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
               className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-indigo-500 rounded-lg"
               value={option.text}
               onChange={(e) => handleOptionTextChange(option.id, e.target.value)}
-              disabled={isBanco}
+              disabled={isBanco || isExam}
             />
           </label>
         </div>
@@ -74,7 +84,7 @@ const MultipleAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
       <div className="flex justify-between mb-4">
         <button
           onClick={addOption}
-          className="text-indigo-500 hover:underline"
+          className={`text-indigo-500 hover:underline ${isExam ? 'hidden' : ''}`}
           type="button"
           disabled={isBanco}
         >
@@ -82,7 +92,7 @@ const MultipleAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
         </button>
         <button
           onClick={deleteLastOption}
-          className="text-red-500 hover:underline"
+          className={`text-indigo-500 hover:underline ${isExam ? 'hidden' : ''}`}
           type="button"
           disabled={isBanco}
         >

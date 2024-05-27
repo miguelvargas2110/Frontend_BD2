@@ -39,7 +39,7 @@ const ElegirExamen = ({ onSelectExamen }) => {
       </div>
     </div>
   );
-  
+   
 };
 
 export default ElegirExamen;

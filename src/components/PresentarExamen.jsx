@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import QuestionExam from "./QuestionExam";
+import examenPresentadoService from "../services/examenPresentadoService";
+import Swal from "sweetalert2";
+import examenService from "../services/examenService";
 
 
-const PresentarExamen = () => {
+const PresentarExamen = (examId) => {
   const {
     register,
     handleSubmit,
@@ -12,20 +15,25 @@ const PresentarExamen = () => {
   } = useForm();
 
   const [formDataPregunta, setFormDataPregunta] = useState({
-    preguntaTexto: "",
-    privacidad: "",
-    idProfesor: 0,
-    idPreguntaPadre: null,
-    cantidadPreguntas: 0,
-    idTema: 0,
-    idTipoPregunta: 0,
+    idExamenPresentado: 0,
+    idPregunta: 0
   });
 
   const [formDataOpcion, setFormDataOpcion] = useState({
-    texto: "",
-    respuesta: "",
-    idPregunta: 0,
+    idOpcion: 0,
+    idPEP: 0
   });
+
+  const [formDataExamen, setFormDataExamen] = useState({
+    fechaPresentado: "",
+    duracion: 0,
+    calificacion: 0,
+    horaInicio: "",
+    examenesIdExamen: 0,
+    estudiantesIdUsuario: 0
+  });
+
+  const [currentTime, setCurrentTime] = useState('');
 
   const [questions, setQuestions] = useState([]);
   const questionIdRef = useRef(1);
@@ -39,10 +47,118 @@ const PresentarExamen = () => {
     );
   };
 
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const response = await examenService.obtenerPreguntasExamen(examId.examId);
+      console.log(response);
+      if (response.success) {
+        const newQuestions = response.message.map((question, index) => ({
+          id: questionIdRef.current++,
+          questionData: question,
+        }));
+        setQuestions(newQuestions);
+      } else {
+        console.error('Error al obtener preguntas:', response.message);
+      }
+    };
+    fetchQuestions();
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    setCurrentTime(`${hours}:${minutes}:${seconds}`);
+  }, [examId.examId]);
+
+
+  const validateQuestions = () => {
+    for (const q of questions) {
+      if (q.questionData.tipo_pregunta === 4) {
+        for (const opcion of q.questionData.opciones) {
+          if (opcion.correct.trim() === "") {
+            return false;
+          }
+        }
+      } else {
+        let algunaOpcionCorrecta = false;
+        for (const opcion of q.questionData.opciones) {
+          if (opcion.correct) {
+            algunaOpcionCorrecta = true;
+            break;
+          }
+        }   
+        if (!algunaOpcionCorrecta) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+  
 
   const onSubmitEnviarExamen = async (data) => {
+    try {
+      if (validateQuestions()) {
+        const fechaActual = new Date();
+        formDataExamen.fechaPresentado = fechaActual.toISOString();
+        formDataExamen.duracion = 0;
+        formDataExamen.calificacion = 0;
+        // Obtener la hora actual en el formato HH:mm:ss
+        const currentTime = fechaActual.toTimeString().split(' ')[0];
+        formDataExamen.horaInicio = fechaActual.toISOString().split('T')[0] + 'T' + currentTime;
+        formDataExamen.examenesIdExamen = examId.examId;
+        formDataExamen.estudiantesIdUsuario = localStorage.getItem('id');
     
+        const response = await examenPresentadoService.crearExamenPresentado(formDataExamen);
+    
+        if (response.success) {
+          const idExamenPresentado = response.message;
+    
+          for (const q of questions) {
+            formDataPregunta.idExamenPresentado = idExamenPresentado;
+            formDataPregunta.idPregunta = q.questionData.id;
+    
+            const responsePreguntaExamen = await examenPresentadoService.crearPEP(formDataPregunta);
+    
+            if (responsePreguntaExamen.success) {
+              const idPEP = responsePreguntaExamen.message;
+              console.log('idPEP:', idPEP);
+    
+              for (const opcion of q.questionData.opciones) {
+                if (opcion.correct) {
+                  formDataOpcion.idOpcion = opcion.id;
+                  formDataOpcion.idPEP = idPEP;
+
+                  console.log('formDataOpcion:', formDataOpcion);
+    
+                  const responseOpcion = await examenPresentadoService.crearResExamPresentado(formDataOpcion);
+    
+                  if (!responseOpcion.success) {
+                    console.error('Error al crear opciones:', responseOpcion.message);
+                  }
+                }
+              }
+            } else {
+              console.error('Error al crear pregunta examen:', responsePreguntaExamen.message);
+            }
+          }
+          Swal.fire({
+            icon: 'success',
+            title: 'Examen entregado correctamente',
+          });
+        } else {
+          console.error('Error al crear examen presentado:', response.message);
+        }
+      }
+    } catch (error) {
+      console.error('Error al enviar examen:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al enviar el examen',
+      });
+    }
   };
+  
 
 
   return (
@@ -76,7 +192,7 @@ const PresentarExamen = () => {
                       onQuestionChange={handleQuestionChange}
                       initialData={q.questionData}
                     />
-                    
+
                   </div>
                 ))}
                 <div className="mt-10">

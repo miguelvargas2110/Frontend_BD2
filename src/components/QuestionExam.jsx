@@ -22,26 +22,24 @@ const QuestionExam = ({ questionId, onQuestionChange, initialData }) => {
     setOptions(updatedOptions);
   };
   
-  const [showComponentQuestion, setshowComponentQuestion] = useState(
-    <UniqueAnswer questionId={questionId} onOptionsChange={handleOptionsChange}  initialOptions={initialData.opciones}/>
-  );
+  const [showComponentQuestion, setshowComponentQuestion] = useState();
 
   useEffect(() => {
     if (initialData.tipo_pregunta === 1) {
       setshowComponentQuestion(
-        <UniqueAnswer readonly questionId={questionId} onOptionsChange={handleOptionsChange} isBanco={false}/>
+        <UniqueAnswer readonly questionId={questionId} onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={false} isExam={true}/>
       );
     } else if (initialData.tipo_pregunta === 2) {
       setshowComponentQuestion(
-        <MultipleAnswer readonly onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={false}/>
+        <MultipleAnswer readonly onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={false} isExam={true}/>
       );
     } else if (initialData.tipo_pregunta === 3) {
       setshowComponentQuestion(
-        <FalseTrueAnswer readonly onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={false}/>
+        <FalseTrueAnswer readonly onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={false} isExam={true}/>
       );
     } else if (initialData.tipo_pregunta === 4) {
       setshowComponentQuestion(
-        <MatchConcepts readonly onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={false}/>
+        <MatchConcepts readonly onOptionsChange={handleOptionsChange} initialOptions={initialData.opciones} isBanco={false} isExam={true}/>
       );
     }
   }, []);
@@ -71,6 +69,7 @@ const QuestionExam = ({ questionId, onQuestionChange, initialData }) => {
             required: "El texto de la pregunta es requerido",
           })}
           value={questionExam.pregunta}
+          disabled
         />
       </div>
       {showComponentQuestion}

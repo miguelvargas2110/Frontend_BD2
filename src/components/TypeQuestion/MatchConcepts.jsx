@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const MatchConcepts = ({ onOptionsChange, initialOptions, isBanco }) => {
+const MatchConcepts = ({ onOptionsChange, initialOptions, isBanco, isExam }) => {
   const [options, setOptions] = useState(initialOptions || [
     { id: 1, text: "", correct: "" },
     { id: 2, text: "", correct: "" },
@@ -25,6 +25,8 @@ const MatchConcepts = ({ onOptionsChange, initialOptions, isBanco }) => {
     }
   };
 
+  const [respuestas, setRespuestas] = useState([]);
+
   const handleConceptChange = (id, newText, newCorrect) => {
     const updatedOptions = options.map((pair) =>
       pair.id === id ? { ...pair, text: newText, correct: newCorrect } : pair
@@ -33,16 +35,33 @@ const MatchConcepts = ({ onOptionsChange, initialOptions, isBanco }) => {
     onOptionsChange(updatedOptions);
   };
 
+
+
   useEffect(() => {
     if (initialOptions) {
-      setOptions(initialOptions);
+      if (isExam) {
+        let respuestaString = initialOptions.map((option, index) => {
+          return option.correct;
+        }).join(" - ");
+  
+        // Crear una copia de initialOptions sin modificar la original
+        let modifiedOptions = initialOptions.map(option => {
+          return { ...option, correct: "" };
+        });
+  
+        setRespuestas(respuestaString);
+        setOptions(modifiedOptions);
+      } else {
+        setOptions(initialOptions);
+      }
     }
   }, [initialOptions]);
+  
 
   return (
     <div>
       <p className="mb-5 font-medium">
-        Debes poner al frente de cada uno de los conceptos, con qué otro se empareja. En el enunciado de la pregunta deben estar los conceptos que se pondrán en la derecha.
+        {`Debes poner al frente de cada uno de los conceptos, con qué otro se empareja entre las siguiente opciones. ${respuestas}`}
       </p>
       {options.map((pair) => (
         <div className="mb-6 flex items-center" key={pair.id}>
@@ -56,7 +75,7 @@ const MatchConcepts = ({ onOptionsChange, initialOptions, isBanco }) => {
               onChange={(e) =>
                 handleConceptChange(pair.id, e.target.value, pair.correct)
               }
-              disabled={isBanco}
+              disabled={isBanco || isExam}
             />
             <span className="mx-2">→</span>
             <input
@@ -76,7 +95,7 @@ const MatchConcepts = ({ onOptionsChange, initialOptions, isBanco }) => {
       <div className="flex justify-between mb-4">
         <button
           onClick={addPair}
-          className="text-indigo-500 hover:underline"
+          className={`text-indigo-500 hover:underline ${isExam ? 'hidden' : ''}`}
           type="button"
           disabled={isBanco}
         >
@@ -84,7 +103,7 @@ const MatchConcepts = ({ onOptionsChange, initialOptions, isBanco }) => {
         </button>
         <button
           onClick={deleteLastPair}
-          className="text-red-500 hover:underline"
+          className={`text-indigo-500 hover:underline ${isExam ? 'hidden' : ''}`}
           type="button"
           disabled={isBanco}
         >

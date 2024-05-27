@@ -23,11 +23,19 @@ const AppContent = () => {
         setComponentToShow("login");
     };
 
+    const navigateToRegister = () => {
+        setComponentToShow("register");
+    };
+
+    const navigateToLogin = () => {
+        setComponentToShow("login");
+    };
+
     return (
       <>
-        {componentToShow === "welcome" && <MainMenu/>}
-        {componentToShow === "login" && <LoginForm onLogin={onLogin} />}
-        {componentToShow === "register" && <RegisterUsers onRegister={onRegister} />}
+        {componentToShow === "welcome" && <MainMenu />}
+        {componentToShow === "login" && <LoginForm onLogin={onLogin} navigateToRegister={navigateToRegister} />}
+        {componentToShow === "register" && <RegisterUsers onRegister={onRegister} navigateToLogin={navigateToLogin} />}
         {componentToShow === "messages" && <AuthContent />}
       </>
     );

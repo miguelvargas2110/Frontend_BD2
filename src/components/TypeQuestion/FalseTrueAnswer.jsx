@@ -32,11 +32,20 @@ const FalseTrueAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
 
   useEffect(() => {
     if (initialOptions) {
-      setOptions(initialOptions);
-      const initialCorrect = initialOptions.find(option => option.correct)?.id;
-      setCorrectOption(initialCorrect);
+        if (isExam) {
+            for (let i = 0; i < initialOptions.length; i++) {
+                if (initialOptions[i].correct) {
+                  initialOptions[i].correct = false;
+                }
+            }
+        }
+
+        setOptions(initialOptions);
+
+        const initialCorrect = initialOptions.find(option => option.correct)?.id;
+        setCorrectOption(initialCorrect);
     }
-  }, [initialOptions]);
+}, [initialOptions, isExam]);
 
   return (
     <div>
@@ -60,7 +69,7 @@ const FalseTrueAnswer = ({ onOptionsChange, initialOptions, isBanco }) => {
               onChange={(e) =>
                 handleOptionTextChange(option.id, e.target.value)
               }
-              disabled={isBanco}
+              disabled={isBanco || isExam}
             />
           </label>
         </div>

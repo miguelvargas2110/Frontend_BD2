@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-const OrderConcepts = () => {
+const OrderConcepts = (isExam) => {
   const [concepts, setConcepts] = useState([
     { id: '1', text: "Concepto 1" },
     { id: '2', text: "Concepto 2" },
@@ -53,7 +53,7 @@ const OrderConcepts = () => {
       </DragDropContext>
       <button
         onClick={addConcept}
-        className="text-indigo-500 hover:underline mt-4"
+        className={`text-indigo-500 hover:underline mt-4 ${isExam ? 'hidden' : ''}`}
       >
         Agregar otro concepto
       </button>

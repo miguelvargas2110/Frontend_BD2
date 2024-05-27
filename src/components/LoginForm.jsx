@@ -1,46 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Swal from 'sweetalert2';
 import loginUser from "../services/usuarioLoginService";
 
-const LoginForm = ({ onLogin }) => {
-  const [active, setActive] = useState(
-    localStorage.getItem("active") || "login"
-  );
-  const {
-    register,
-    watch,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
+const LoginForm = ({ onLogin, navigateToRegister }) => {
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [formData, setFormData] = useState({
     correo: '',
     contrasena: ''
-  }); 
+  });
 
-  const onSubmitLogin = async(data) => {
+  const onSubmitLogin = async (data) => {
     formData.correo = data.loginEmail;
     formData.contrasena = data.loginPassword;
 
-    try{
+    try {
       const response = await loginUser(formData);
-      if(response.success){
+      if (response.success) {
         onLogin();
-      }else{
+      } else {
         Swal.fire({
-            icon: "error",
-            text: response.message
+          icon: "error",
+          text: response.message
         });
-    }
-    }catch(error){
+      }
+    } catch (error) {
       console.error('Error al registrarse:', error);
       Swal.fire({
-          icon: "error",
-          text: 'Error al registrarse'
-      });  
-
-  }
+        icon: "error",
+        text: 'Error al registrarse'
+      });
+    }
   };
 
   return (
@@ -109,6 +99,14 @@ const LoginForm = ({ onLogin }) => {
               </button>
             </div>
           </form>
+          <div className="mt-6">
+            <button
+              onClick={navigateToRegister}
+              className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500"
+            >
+              Registrarse
+            </button>
+          </div>
         </div>
       </div>
     </div>
